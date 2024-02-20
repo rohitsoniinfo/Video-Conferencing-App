@@ -4,13 +4,42 @@ A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+# Video Conferencing Project README
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Project Overview:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This project aims to develop a video conferencing application utilizing Agora API for video conferencing functionality and Agora Notifications channels for real-time notifications. The backend server is implemented in Java to provide API endpoints for managing user authentication, session management, and other necessary functionalities. The frontend is developed using the Flutter framework for building native cross-platform applications.
+
+---
+
+## Technologies Used:
+
+- **Agora API**: Agora provides real-time engagement APIs and SDKs to facilitate voice, video, and live interactive streaming experiences across various platforms.
+  
+- **Agora Notifications Channels**: Agora Notifications Channels enables real-time notifications for various events and actions within the application, enhancing user experience and engagement.
+  
+- **Java**: Java is utilized for implementing the backend server, offering robustness, scalability, and compatibility with a wide range of systems and platforms.
+
+- **Flutter**: Flutter is used for building the frontend user interface, providing a fast and expressive way to create native cross-platform applications.
+
+---
+
+## Project Components:
+
+1. **Agora Video Conferencing Integration**: Integration of Agora API to facilitate real-time video conferencing capabilities within the application.
+  
+2. **Agora Notifications Channels Integration**: Implementation of Agora Notifications Channels to provide users with real-time notifications regarding important events and actions.
+  
+3. **Java Server Backend**: The Java server acts as the API web endpoint, providing necessary functionalities such as user authentication, session management, and data processing.
+
+4. **Flutter Frontend**: The Flutter frontend provides the user interface for the video conferencing application, allowing users to interact with the system seamlessly.
+
+---
+
+## Getting Started:
+
+### Prerequisites:
+
+- Ensure you have access to the Agora API and Agora Notifications Channels. Obtain the necessary credentials and API keys from Agora's developer portal.
