@@ -37,9 +37,14 @@ class _VideoCallPageState extends State<VideoCallPage> {
   late double _viewAspectRatio;
 
   int? _currentUid = 0 ;
+
   bool _isMicEnabled = true;
 
   bool _isVideoEnabled = true;
+
+  bool _isLocalMicEnabled = true;
+
+  bool _isLocalVideoEnabled = true;
 
   int? _remoteUid;
 
@@ -50,12 +55,14 @@ class _VideoCallPageState extends State<VideoCallPage> {
       content: Text(message),
     ));
   }
+  
 
   //Initialize the Agora RTC Engine
   Future<void> _initAgoraRtcEngine() async {
     //_agoraEngine = await RtcEngine.create(widget.appId);
     await [Permission.microphone, Permission.camera].request();
     _agoraEngine = createAgoraRtcEngine();
+
     // VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
     // configuration.orientationMode = VideoOutputOrientationMode.Adaptative;
     // await _agoraEngine.setVideoEncoderConfiguration(configuration);
@@ -65,6 +72,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
     // await _agoraEngine.setClientRole(ClientRole.Broadcaster);
     // await _agoraEngine.muteLocalAudioStream(!widget.isMicEnabled);
     // await _agoraEngine.muteLocalVideoStream(!widget.isVideoEnabled);
+
     await _agoraEngine.initialize(const RtcEngineContext(
         appId: 'aaff3a381e23485090d0ae05ddc8ada1'
     ));
@@ -164,8 +172,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
               _users.add(
                 AgoraUser(
                   uid: 0,
-                  isAudioEnabled: _isMicEnabled,
-                  isVideoEnabled: _isVideoEnabled,
+                  isAudioEnabled: _isLocalMicEnabled,
+                  isVideoEnabled: _isLocalVideoEnabled,
                   view: AgoraVideoView(
                     controller: VideoViewController(
                       rtcEngine: _agoraEngine,
@@ -176,13 +184,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
               );
             });
           },
-//AgoraVideoView(
-//                         controller: VideoViewController.remote(
-//                           rtcEngine: _agoraEngine,
-//                           canvas: VideoCanvas(uid: connection.localUid!),
-//                           connection: RtcConnection(channelId: connection.channelId),
-//                         ),
-//                       )
 
           //     firstLocalAudioFrame: (elapsed) {
           //       final info = 'LOG::firstLocalAudio: $elapsed';
@@ -254,6 +255,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
               );
             });
           },
+
           //     userOffline: (uid, elapsed) {
           //       final info = 'LOG::userOffline: $uid';
           //       debugPrint(info);
@@ -265,6 +267,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
           //       }
           //       setState(() => _users.remove(userToRemove));
           //     },
+
           onUserOffline: (RtcConnection connection, int remoteUid,
               UserOfflineReasonType reason) {
             showMessage("Remote user uid:$remoteUid left the channel");
@@ -275,7 +278,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
               _users.removeWhere((element) => element.uid == remoteUid);
               print("length of _users after removing: ");
               print(_users.length);
-              //_users.remove(_remoteUid);
             });
           },
           //     firstRemoteAudioFrame: (uid, elapsed) {
@@ -343,22 +345,27 @@ class _VideoCallPageState extends State<VideoCallPage> {
 
   void _onToggleAudio() {
     setState(() {
-      _isMicEnabled = !_isMicEnabled;
+      _isLocalMicEnabled = !_isLocalMicEnabled;
       for (AgoraUser user in _users) {
-        if (user.uid == _currentUid) { //_currentUid
-          user.isAudioEnabled = _isMicEnabled;
+        if (user.uid == 0) { //_currentUid
+          user.isAudioEnabled = _isLocalMicEnabled;
         }
       }
     });
-    _agoraEngine.muteLocalAudioStream(!_isMicEnabled);
+    _agoraEngine.muteLocalAudioStream(!_isLocalMicEnabled);
   }
 
   void _onToggleCamera() {
     setState(() {
-      _isVideoEnabled = !_isVideoEnabled;
+      _isLocalVideoEnabled = !_isLocalVideoEnabled;
       for (AgoraUser user in _users) {
-        if (user.uid == _currentUid) { //_currentUid
-          setState(() => user.isVideoEnabled = _isVideoEnabled);
+        if (user.uid == 0) {//_currentUid
+          print("user.uid : ");
+          print(user.uid);
+          print("_currentUid : ");
+          print(_currentUid);
+          setState(() => user.isVideoEnabled = _isLocalVideoEnabled);
+
         }
       }
     });
@@ -459,8 +466,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: CallActionsRow(
-                    isMicEnabled: _isMicEnabled,
-                    isVideoEnabled: _isVideoEnabled,
+                    isMicEnabled: _isLocalMicEnabled,
+                    isVideoEnabled: _isLocalVideoEnabled,
                     onCallEnd: () => _onCallEnd(context),
                     onToggleAudio: _onToggleAudio,
                     onToggleCamera: _onToggleCamera,
@@ -475,104 +482,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
     );
   }
 
-//Scaffold(
-//       backgroundColor: Colors.black,
-//       appBar: AppBar(
-//         automaticallyImplyLeading: false,
-//         backgroundColor: Colors.black,
-//         surfaceTintColor: Colors.black,
-//         centerTitle: false,
-//         title: Row(
-//           children: [
-//             const Icon(
-//               Icons.meeting_room_rounded,
-//               color: Colors.white54,
-//             ),
-//             const SizedBox(width: 6.0),
-//             const Text(
-//               'Channel name: ',
-//               style: TextStyle(
-//                 color: Colors.white54,
-//                 fontSize: 16.0,
-//               ),
-//             ),
-//             Text(
-//               widget.channelName,
-//               style: const TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 16.0,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//           ],
-//         ),
-//         actions: [
-//           Padding(
-//             padding: const EdgeInsets.only(right: 8.0),
-//             child: Row(
-//               mainAxisSize: MainAxisSize.min,
-//               children: [
-//                 const Icon(
-//                   Icons.people_alt_rounded,
-//                   color: Colors.white54,
-//                 ),
-//                 const SizedBox(width: 6.0),
-//                 Text(
-//                   _users.length.toString(),
-//                   style: const TextStyle(
-//                     color: Colors.white54,
-//                     fontSize: 16.0,
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           )
-//         ],
-//       ),
-
-//       body: SafeArea(
-//         child: Column(
-//           children: [
-//             Expanded(
-//               child: Padding(
-//                 padding: const EdgeInsets.all(16.0),
-//                 child: OrientationBuilder(
-//                   builder: (context, orientation) {
-//                     final isPortrait = orientation == Orientation.portrait;
-//                     if (_users.isEmpty) {
-//                       return const SizedBox();
-//                     }
-//                     WidgetsBinding.instance.addPostFrameCallback(
-//                           (_) => setState(
-//                               () => _viewAspectRatio = isPortrait ? 2 / 3 : 3 / 2),
-//                     );
-//                     final layoutViews = _createLayout(_users.length);
-//                     return VL.AgoraVideoLayout(
-//                       users: _users,
-//                       views: layoutViews,
-//                       viewAspectRatio: _viewAspectRatio,
-//                     );
-//                   },
-//                 ),
-//               ),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.symmetric(vertical: 16.0),
-//               child: CallActionsRow(
-//                 isMicEnabled: _isMicEnabled,
-//                 isVideoEnabled: _isVideoEnabled,
-//                 onCallEnd: () => _onCallEnd(context),
-//                 onToggleAudio: _onToggleAudio,
-//                 onToggleCamera: _onToggleCamera,
-//                 onSwitchCamera: _onSwitchCamera,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     )
-
-//Formula for building video layout
 
   List<int> _createLayout(int n) {
     int rows = (sqrt(n).ceil());
@@ -587,6 +496,3 @@ class _VideoCallPageState extends State<VideoCallPage> {
     return layout;
   }
 }
-
-
-
