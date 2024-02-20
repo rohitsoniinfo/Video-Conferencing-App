@@ -19,7 +19,7 @@ class VideoCallPage extends StatefulWidget {
     required this.isVideoEnabled,
   });
 
-  final String appId = "aaff3a381e23485090d0ae05ddc8ada1";
+  final String appId = "";
   final String token;
   final String channelName;
   final bool isMicEnabled;
@@ -74,7 +74,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
     // await _agoraEngine.muteLocalVideoStream(!widget.isVideoEnabled);
 
     await _agoraEngine.initialize(const RtcEngineContext(
-        appId: 'aaff3a381e23485090d0ae05ddc8ada1'
+        appId: ''
     ));
     //await _agoraEngine.enableLocalVideo(true);
     await _agoraEngine.enableVideo();
