@@ -1,16 +1,9 @@
-# newapp
-
-A new Flutter project.
-
-## Getting Started
-
-# Video Conferencing Project README
-
+# Video Conferencing App
 ---
 
 ## Project Overview:
 
-This project aims to develop a video conferencing application utilizing Agora API for video conferencing functionality and Agora Notifications channels for real-time notifications. The backend server is implemented in Java to provide API endpoints for managing user authentication, session management, and other necessary functionalities. The frontend is developed using the Flutter framework for building native cross-platform applications.
+This project aims to develop a video conferencing application utilizing Agora API for video conferencing functionality and Agora Notifications channels for real-time notifications. The backend server is implemented in Java to provide API endpoints for managing user authentication, session management, and other necessary functionalities. The front end is developed using the Flutter framework for building native cross-platform applications.
 
 ---
 
@@ -18,7 +11,7 @@ This project aims to develop a video conferencing application utilizing Agora AP
 
 - **Agora API**: Agora provides real-time engagement APIs and SDKs to facilitate voice, video, and live interactive streaming experiences across various platforms.
   
-- **Agora Notifications Channels**: Agora Notifications Channels enables real-time notifications for various events and actions within the application, enhancing user experience and engagement.
+- **Agora Notifications Channels**: Agora Notifications Channels enable real-time notifications for various events and actions within the application, enhancing user experience and engagement.
   
 - **Java**: Java is utilized for implementing the backend server, offering robustness, scalability, and compatibility with a wide range of systems and platforms.
 
@@ -38,8 +31,3 @@ This project aims to develop a video conferencing application utilizing Agora AP
 
 ---
 
-## Getting Started:
-
-### Prerequisites:
-
-- Ensure you have access to the Agora API and Agora Notifications Channels. Obtain the necessary credentials and API keys from Agora's developer portal.
