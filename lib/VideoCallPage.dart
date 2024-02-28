@@ -339,7 +339,9 @@ class _VideoCallPageState extends State<VideoCallPage> {
   Future<void> _onCallEnd(BuildContext context) async {
     await _agoraEngine.leaveChannel();
     if (context.mounted) {
-      Navigator.of(context).pop();
+      // Navigator.of(context).pop();
+      int count = 0;
+      Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
     }
   }
 

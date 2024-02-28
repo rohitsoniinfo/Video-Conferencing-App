@@ -7,12 +7,12 @@ import 'package:newapp/VideoCallPage.dart';
 
 class createChannelPage extends StatefulWidget {
   const createChannelPage({super.key});
-
   @override
   State<createChannelPage> createState() => _createChannelPageState();
 }
 
 class _createChannelPageState extends State<createChannelPage> {
+
   String token = '';
   String channelName = '';
 
@@ -330,7 +330,8 @@ class _createChannelPageState extends State<createChannelPage> {
                                                   channelTextController.text,
                                               isMicEnabled: true,
                                               isVideoEnabled: true,
-                                            )),
+                                            ),
+                                    ),
                                   );
                                 }, //_joinRoom,
                                 child: const Text(
