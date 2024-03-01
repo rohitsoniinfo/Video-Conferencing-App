@@ -1,39 +1,69 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:newapp/UserData.dart';
 import 'package:newapp/WaitingCallScreen.dart';
-import 'constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class RandomCall extends StatefulWidget {
   // const RandomCall({super.key});
   final int? userId;
   final String? name;
   final String? email;
-  const RandomCall({Key? key,  this.userId,  this.name,  this.email}) : super(key: key);
+  final String? contact;
+  final String? address;
+  final String? gender;
+  final String? password;
+  const RandomCall({Key? key, this.userId, this.name, this.email, this.contact, this.address, this.gender, this.password}) : super(key: key);
 
   @override
   State<RandomCall> createState() => _RandomCallState();
 }
 
 class _RandomCallState extends State<RandomCall> {
+  int? _userId;
+  String? _name = "";
+  String? _mail = "";
+  String? _contact;
+  String? _address;
+  String? _gender;
+  String? _password;
 
-  String _name = uniqueUserName;
-  String _mail = uniqueEmailID;
 
+
+  String dropdownValue = 'male';
+
+
+  _firstTimeGetSignupData()
+  {
+    setState(() {
+      _name = widget.name;
+      _mail = widget.email;
+      _userId = widget.userId;
+      _contact = widget.contact;
+      _address = widget.address;
+      _gender = widget.gender;
+      _password = widget.password;
+    });
+  }
+  printUserSavedData() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("printing the saved users data : ");
+    print(prefs.getString('name'));
+    print(prefs.getString('email'));
+    print(prefs.getInt('userId'));
+    print(prefs.getString('JWTToken'));
+    setState(() {
+      _userId = prefs.getInt('userId');
+      _name = prefs.getString('name');
+      _mail = prefs.getString('email');
+      _contact = prefs.getString('contact');
+      _address = prefs.getString('address');
+      _gender = prefs.getString('gender');
+      _password = prefs.getString('password');
+    });
+  }
   @override
-  void initState() {
-    // print("printing data from RandomCall() class. ");
-    // print("userId: ${widget.userId}");
-    // print("name: ${widget.name}");
-    // print("email: ${widget.email}");
-    if(uniqueUserName.isEmpty ||  uniqueEmailID.isEmpty || uniqueUserID == null)
-      {
-        uniqueUserName = widget.name!;
-        uniqueEmailID = widget.email!;
-        uniqueUserID = widget.userId!;
-      }
-    _name = uniqueUserName;
-    _mail = uniqueEmailID;
+  void initState()  {
+    _firstTimeGetSignupData();
+    printUserSavedData();
     super.initState();
   }
   @override
@@ -64,6 +94,7 @@ class _RandomCallState extends State<RandomCall> {
             tooltip: 'Information',
             onPressed: () {
               // handle the press
+              printUserSavedData();
             },
           ),
         ],
@@ -87,7 +118,8 @@ class _RandomCallState extends State<RandomCall> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Icon(Icons.person,color: Colors.white,size: 60,),
-                  Text(_name, style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold, fontSize: 30),),
+
+                  _name != null ? Text(_name!, style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold, fontSize: 30),) : Text(''),
                 ],
               ),
             ),
@@ -97,7 +129,7 @@ class _RandomCallState extends State<RandomCall> {
                 children: [
                   Icon(Icons.verified_user),
                   SizedBox(width: 40,),
-                  widget.userId != null ? Text(widget.userId.toString(), style: TextStyle(color: Colors.black, fontSize: 20),) : CircularProgressIndicator(),
+                  _userId != null ? Text(_userId.toString(), style: TextStyle(color: Colors.black, fontSize: 20),) : CircularProgressIndicator(),
                 ],
               ),
               onTap: () {
@@ -111,7 +143,47 @@ class _RandomCallState extends State<RandomCall> {
                 children: [
                   Icon(Icons.email),
                   SizedBox(width: 40,),
-                  Text(_mail, style: TextStyle(color: Colors.black, fontSize: 20),),
+                  _mail!=null ? Text(_mail!, style: TextStyle(color: Colors.black, fontSize: 20),) : Text('data'),
+                ],
+              ),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.place),
+                  SizedBox(width: 40,),
+                  _address!=null ? Text(_address!, style: TextStyle(color: Colors.black, fontSize: 20),) : Text(''),
+                ],
+              ),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.phone),
+                  SizedBox(width: 40,),
+                  _contact!=null ? Text(_contact!, style: TextStyle(color: Colors.black, fontSize: 20),) : Text(''),
+                ],
+              ),
+              onTap: () {
+              },
+            ),
+            ListTile(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.person_pin_sharp),
+                  SizedBox(width: 40,),
+                  _gender!=null ? Text(_gender!, style: TextStyle(color: Colors.black, fontSize: 20),) : Text(''),
                 ],
               ),
               onTap: () {
@@ -125,12 +197,10 @@ class _RandomCallState extends State<RandomCall> {
                 children: [
                   Icon(Icons.password),
                   SizedBox(width: 40,),
-                  Text('Password', style: TextStyle(color: Colors.black, fontSize: 20),),
+                  _password != null ? Text(_password!, style: TextStyle(color: Colors.black, fontSize: 20),) : Text(''),
                 ],
               ),
               onTap: () {
-                // Update the state of the app.
-                // ...
               },
             ),
           ],
@@ -143,6 +213,38 @@ class _RandomCallState extends State<RandomCall> {
             Text(
               'Welcome to app!',
               style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold, fontSize: 30),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey,
+              ),
+              child: DropdownButton<String>(
+                dropdownColor: Colors.grey,
+                alignment: Alignment.topCenter,
+                value: dropdownValue,
+                borderRadius: BorderRadius.circular(20),
+                items: <String>['male', 'female', 'Any'].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          value,
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                // Step 5.
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue = newValue!;
+                  });
+                },
+              ),
             ),
             Image.asset(
               'assets/images/videocall.png',

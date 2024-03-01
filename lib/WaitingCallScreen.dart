@@ -4,36 +4,75 @@ import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:newapp/VideoCallPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WaitingCallScreen extends StatefulWidget {
    // WaitingCallScreen({required this.connectingString});
    // String connectingString;
-
   @override
   State<WaitingCallScreen> createState() => _WaitingCallScreenState();
 }
 
 class _WaitingCallScreenState extends State<WaitingCallScreen> {
+   String ExtractedToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmdlbHByaXlhMTIzQC5jb20iLCJpYXQiOjE3MDkzMTA0OTMsImV4cCI6MTcwOTMyODQ5M30.WjCTP16xU5sLzDbi6VKsymsgeLFGZaQ7rl2me8-vrro";
+
+  String appId = 'aaff3a381e23485090d0ae05ddc8ada1';
   bool _isActive = false;
 
+  String token = '';
   String? fetchedConnectingString;
+  String channelName = '';
 
-  Future<void> getData() async {
-    String url = 'https://jsonplaceholder.typicode.com/todos/1';
+  String? JWTToken;
+  int? userId ;
+
+  void setToken(String newToken) async {
+    token = newToken;
+    if (isTokenExpiring) {
+      // Renew the token
+      //agoraEngine.renewToken(token);
+      isTokenExpiring = false;
+      showMessage("Token renewed");
+    } else {
+      // Join a channel.
+      showMessage("Token received, joining a channel...");
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VideoCallPage(
+          token: token,
+          channelName: channelName,
+          isMicEnabled: true,
+          isVideoEnabled: true,
+        ),
+      ),
+    );
+  }
+  Future<void> fetchToken(int uid, String channelName, int tokenRole) async {
+    // Prepare the Url
+    String url =
+        '$serverUrl/rtc/$channelName/${tokenRole.toString()}/uid/${uid.toString()}'; //?expiry=${tokenExpireTime.toString()}';
+
+    // Send the request
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       // If the server returns an OK response, then parse the JSON.
       Map<String, dynamic> json = jsonDecode(response.body);
-      String title = json['title'];
-      fetchedConnectingString = title;
-      print("fetchedConnectingString: $fetchedConnectingString" );
+      String newToken = json['rtcToken'];
+      debugPrint('Token Received: $newToken');
+      // Use the token to join a channel or renew an expiring token
+      _isActive = true;
+      setToken(newToken);
     } else {
       // If the server did not return an OK response,
       // then throw an exception.
-      throw Exception('Failed to fetch a connecting string. Make sure that your server URL is valid');
+      throw Exception(
+          'Failed to fetch a token. Make sure that your server URL is valid');
     }
   }
+
 
   Future<void> join() async {
     //await agoraEngine.startPreview(); // Uncomment if required
@@ -48,9 +87,31 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
     }
   }
 
-  void method() async
-  {
+  Future<void> getData() async {
+    String api = "https://f10a-2409-40c4-3019-c899-1c1d-f59c-a36d-fc4f.ngrok-free.app";
+    String fetchedUrl = "/api/User/${userId.toString()}?gender=male";
+    String url = api + fetchedUrl;
+    final response = await http.get(
+        Uri.parse(url),
+        headers: {'Authorization': 'Bearer $JWTToken', 'Content-Type': 'application/json', // Adjust content type if needed
+    });
+    if (response.statusCode == 200) {
+      // If the server returns an OK response, then parse the JSON.
+      Map<String, dynamic> json = jsonDecode(response.body);
+      String title = json['channel'];
+      fetchedConnectingString = title;
+      print("fetchedConnectingString: $fetchedConnectingString" );
+    }
+    else {
+      // If the server did not return an OK response,
+      // then throw an exception.
+      throw Exception('Failed to fetch a connecting string. Make sure that your server URL is valid');
+    }
+
+  }
+  void method() async  {
     try {
+      await updateJwtToken();
       await getData();
       if (fetchedConnectingString != null && fetchedConnectingString!.isNotEmpty) {
         await join();
@@ -61,25 +122,20 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
       print("Error fetching data: $e");
     }
   }
-
+   Future<void> updateJwtToken() async
+   {
+     final prefs = await SharedPreferences.getInstance();
+     JWTToken = prefs.getString('JWTToken');
+     userId = prefs.getInt('userId');
+     print("jwtToken inside the WaitingCallScreen : $JWTToken");
+     print("printing the userId inside WaitingCallScreen : $userId");
+   }
   @override
   void initState() {
-    // super.initState();
-    // try {
-    //   await getData();
-    //   if (fetchedConnectingString != null && fetchedConnectingString!.isNotEmpty) {
-    //     await join();
-    //   } else {
-    //     print("Connecting string not fetched or is empty.");
-    //   }
-    // } on Exception catch (e) {
-    //   print("Error fetching data: $e");
-    // }
     method();
   }
 
-  String token = '';
-  String channelName = '';
+
 
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
   GlobalKey<ScaffoldMessengerState>(); // Global key to access the scaffold
@@ -89,7 +145,6 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
     ));
   }
 
-  String appId = 'aaff3a381e23485090d0ae05ddc8ada1';
 
   final _formKey = GlobalKey<FormState>();
   @override
@@ -131,42 +186,6 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
     await agoraEngine.initialize(const RtcEngineContext(appId: ''));
   }
 
-
-  Future<void> fetchToken(int uid, String channelName, int tokenRole) async {
-    // Prepare the Url
-    String url =
-        '$serverUrl/rtc/$channelName/${tokenRole.toString()}/uid/${uid.toString()}'; //?expiry=${tokenExpireTime.toString()}';
-
-    // Send the request
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      // If the server returns an OK response, then parse the JSON.
-      Map<String, dynamic> json = jsonDecode(response.body);
-      String newToken = json['rtcToken'];
-      debugPrint('Token Received: $newToken');
-      // Use the token to join a channel or renew an expiring token
-      _isActive = true;
-      setToken(newToken);
-    } else {
-      // If the server did not return an OK response,
-      // then throw an exception.
-      throw Exception(
-          'Failed to fetch a token. Make sure that your server URL is valid');
-    }
-  }
-  void setToken(String newToken) async {
-    token = newToken;
-    if (isTokenExpiring) {
-      // Renew the token
-      //agoraEngine.renewToken(token);
-      isTokenExpiring = false;
-      showMessage("Token renewed");
-    } else {
-      // Join a channel.
-      showMessage("Token received, joining a channel...");
-    }
-  }
 
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
