@@ -19,7 +19,6 @@ class VideoCallPage extends StatefulWidget {
     required this.isVideoEnabled,
   });
 
-  final String appId = "aaff3a381e23485090d0ae05ddc8ada1";
   final String token;
   final String channelName;
   final bool isMicEnabled;
@@ -255,7 +254,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
               );
             });
           },
-
           //     userOffline: (uid, elapsed) {
           //       final info = 'LOG::userOffline: $uid';
           //       debugPrint(info);
@@ -267,7 +265,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
           //       }
           //       setState(() => _users.remove(userToRemove));
           //     },
-
           onUserOffline: (RtcConnection connection, int remoteUid,
               UserOfflineReasonType reason) {
             showMessage("Remote user uid:$remoteUid left the channel");
@@ -278,6 +275,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
               _users.removeWhere((element) => element.uid == remoteUid);
               print("length of _users after removing: ");
               print(_users.length);
+              int count = 0;
+              Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
             });
           },
           //     firstRemoteAudioFrame: (uid, elapsed) {

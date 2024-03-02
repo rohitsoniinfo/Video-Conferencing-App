@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/constant.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'dart:convert';
@@ -16,7 +17,7 @@ class WaitingCallScreen extends StatefulWidget {
 class _WaitingCallScreenState extends State<WaitingCallScreen> {
    String ExtractedToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmdlbHByaXlhMTIzQC5jb20iLCJpYXQiOjE3MDkzMTA0OTMsImV4cCI6MTcwOTMyODQ5M30.WjCTP16xU5sLzDbi6VKsymsgeLFGZaQ7rl2me8-vrro";
 
-  String appId = 'aaff3a381e23485090d0ae05ddc8ada1';
+
   bool _isActive = false;
 
   String token = '';
@@ -49,6 +50,7 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
       ),
     );
   }
+
   Future<void> fetchToken(int uid, String channelName, int tokenRole) async {
     // Prepare the Url
     String url =
@@ -88,11 +90,9 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
   }
 
   Future<void> getData() async {
-    String api = "https://f10a-2409-40c4-3019-c899-1c1d-f59c-a36d-fc4f.ngrok-free.app";
-    String fetchedUrl = "/api/User/${userId.toString()}?gender=male";
-    String url = api + fetchedUrl;
+    kFetchingChannelUrl = "/api/User/${userId.toString()}?gender=male";
     final response = await http.get(
-        Uri.parse(url),
+        Uri.parse(kApiUrlLink + kFetchingChannelUrl),
         headers: {'Authorization': 'Bearer $JWTToken', 'Content-Type': 'application/json', // Adjust content type if needed
     });
     if (response.statusCode == 200) {
@@ -107,7 +107,6 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
       // then throw an exception.
       throw Exception('Failed to fetch a connecting string. Make sure that your server URL is valid');
     }
-
   }
   void method() async  {
     try {

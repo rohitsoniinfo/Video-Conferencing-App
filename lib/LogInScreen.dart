@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import 'RandomCall.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:newapp/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'RandomCall.dart';
@@ -16,8 +17,6 @@ class LoginInScreen extends StatefulWidget {
 
 class _LoginInScreenState extends State<LoginInScreen> {
 
-  String apiUrl = 'https://f10a-2409-40c4-3019-c899-1c1d-f59c-a36d-fc4f.ngrok-free.app';
-  String loginApiString = '/api/auth/login';
   String result = "";
 
   String? name;
@@ -38,7 +37,7 @@ class _LoginInScreenState extends State<LoginInScreen> {
     try
     {
       final response = await http.post(
-        Uri.parse(apiUrl+loginApiString),
+        Uri.parse(kApiUrlLink+kLoginApi),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -47,11 +46,9 @@ class _LoginInScreenState extends State<LoginInScreen> {
           'password':passwordController.text,
         }),
       );
-      print("inside try block. ");
 
       if (response.statusCode == 200) {
         // Successful POST request, handle the response here
-        print("hello world ");
         final responseData = jsonDecode(response.body);
         print(responseData);
         setState(() {

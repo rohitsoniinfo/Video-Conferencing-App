@@ -4,7 +4,7 @@ import 'RandomCall.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'constant.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -14,8 +14,6 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
 
-  String apiUrl = 'https://f10a-2409-40c4-3019-c899-1c1d-f59c-a36d-fc4f.ngrok-free.app';
-  String signupApiString = '/api/User/Create';
   String result = "";
 
   int? userId;
@@ -46,7 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future<void> _postData() async {
     try {
       final response = await http.post(
-        Uri.parse(apiUrl+signupApiString),
+        Uri.parse(kApiUrlLink+kSignupApi),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
