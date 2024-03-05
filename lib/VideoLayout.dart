@@ -57,8 +57,6 @@ class AgoraVideoView extends StatelessWidget {
   }
 }
 
-
-
 //Responsive video layout
 class AgoraVideoLayout extends StatelessWidget {
   const AgoraVideoLayout({
@@ -82,13 +80,10 @@ class AgoraVideoLayout extends StatelessWidget {
 
     List<Widget> rowsList = [];
 
-    for (int i = 0; i < rows; i++)
-    {
-
+    for (int i = 0; i < rows; i++) {
       List<Widget> rowChildren = [];
 
-      for (int j = 0; j < columns; j++)
-      {
+      for (int j = 0; j < columns; j++) {
         int index = i * columns + j;
         if (index < totalCount) {
           rowChildren.add(
@@ -97,8 +92,7 @@ class AgoraVideoLayout extends StatelessWidget {
               viewAspectRatio: _viewAspectRatio,
             ),
           );
-        }
-        else {
+        } else {
           rowChildren.add(
             const SizedBox.shrink(),
           );
@@ -120,8 +114,6 @@ class AgoraVideoLayout extends StatelessWidget {
   }
 }
 
-
-
 //Formula for building video layout
 List<int> _createLayout(int n) {
   int rows = (sqrt(n).ceil());
@@ -135,5 +127,3 @@ List<int> _createLayout(int n) {
   }
   return layout;
 }
-
-

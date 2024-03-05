@@ -1,23 +1,22 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:newapp/LogInScreen.dart';
 import 'package:newapp/SignUpScreen.dart';
 import 'RandomCall.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp( MaterialApp(home: panel()));
+void main() => runApp(MaterialApp(home: panel()));
 
 class panel extends StatelessWidget {
-   panel({super.key});
+  panel({super.key});
   @override
   Widget build(BuildContext context) {
     //return createChannelPage();
-    return AppInitializer();
+    return RandomCall();
   }
 }
 
 class AppInitializer extends StatefulWidget {
   const AppInitializer({super.key});
-
   @override
   State<AppInitializer> createState() => _AppInitializerState();
 }
@@ -39,6 +38,7 @@ class _AppInitializerState extends State<AppInitializer> {
       _isFirstTimeUser = isFirstTimeUser;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return _isFirstTimeUser ? SignUpScreen() : RandomCall();

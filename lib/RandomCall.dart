@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:newapp/WaitingCallScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class RandomCall extends StatefulWidget {
   // const RandomCall({super.key});
   final int? userId;
@@ -24,7 +25,6 @@ class _RandomCallState extends State<RandomCall> {
   String? _address;
   String? _gender;
   String? _password;
-
 
 
   String dropdownValue = 'male';

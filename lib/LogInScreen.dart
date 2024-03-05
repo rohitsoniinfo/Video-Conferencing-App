@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:newapp/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:newapp/Component/SignUpScreenUiComponent.dart';
 import 'RandomCall.dart';
 
 
@@ -80,64 +80,97 @@ class _LoginInScreenState extends State<LoginInScreen> {
 
 
 
+  OutlineInputBorder inputBorder(){ //return type is OutlineInputBorder
+    return const OutlineInputBorder( //Outline border type for TextFeild
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        borderSide: BorderSide(
+          color:Colors.grey,
+          width: 3,
+        )
+    );
+  }
+
+  OutlineInputBorder focusBorder(){
+    return const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        borderSide: BorderSide(
+          color:Colors.black,
+          width: 3,
+        )
+    );
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.red,
-        title: Text(
-          'Log In',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Container(child: Image.asset('assets/images/signupmod.png',)),
-            Card(
-              margin: EdgeInsets.all(20.0),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
+      // appBar: AppBar(
+      //   centerTitle: true,
+      //   backgroundColor: Colors.red,
+      //   title: Text(
+      //     'Log In',
+      //     style: TextStyle(
+      //       color: Colors.white,
+      //     ),
+      //   ),
+      // ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              TopBottomDesign(
+                  true,
+                  const BorderRadius.only(bottomRight: Radius.circular(200)),
+                  BorderRadius.only(bottomLeft: Radius.circular(200))
+                  ),
+                  const Text('Login Here',style: TextStyle(color: Colors.blue, fontSize: 50, fontStyle: FontStyle.italic,fontWeight: FontWeight.bold),),
+                  Container(height: 270,width: 300,decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/signupmod.png'))),),
+                   //Image.asset('assets/images/signupmod.png'),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Image.asset('assets/images/signupmod.png'),
-                    TextField(
-                      controller: fullNameController,
-                      decoration: InputDecoration(labelText: 'Email or Phone'),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: passwordController,
-                      decoration: InputDecoration(labelText: 'Password'),
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 20),
+                  children: [
+                    //const SizedBox(height: 10,),
+                    //Image.asset('assets/images/signupmod.png'),
+                    const SizedBox(height: 10),
+                       customTextField('Email or Phone', fullNameController, Icons.person),
+                    const SizedBox(height: 10),
+                    customTextField('Password', passwordController, Icons.password),
+                    const SizedBox(height: 10),
                     ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.blue),
+                        //fixedSize: MaterialStateProperty.resolveWith((states) => Size(100, 30))
+                      ),
                       onPressed: ()  async {
                         print("clicked login button");
                         await _postLoginDAta();
-                          Navigator.push(
+                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => RandomCall(),
                             ),
                           );
                         print("jwtToken : $JWTToken");
-
+                        
                         _setJWTToken();
                       },
-                      child: Text('LogIn'),
+                      child:  const Text('LogIn ',style: TextStyle(color: Colors.white,fontSize: 20),),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+              TopBottomDesign(
+                  false,
+                  const BorderRadius.only(topRight: Radius.circular(200)),
+                  const BorderRadius.only(topLeft: Radius.circular(200)),
+                  ),
+            ],
+          ),
         ),
       ),
     );
