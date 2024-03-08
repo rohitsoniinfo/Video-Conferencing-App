@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-//import 'RandomCall.dart';
+import 'package:flutter/services.dart';
+import 'RandomCall.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:newapp/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:newapp/Component/SignUpScreenUiComponent.dart';
-import 'RandomCall.dart';
 
 
 class LoginInScreen extends StatefulWidget {
@@ -102,10 +102,13 @@ class _LoginInScreenState extends State<LoginInScreen> {
 
 
 
+  bool isPasswordVisibility = false;
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       backgroundColor: Colors.white,
       // appBar: AppBar(
       //   centerTitle: true,
@@ -137,9 +140,40 @@ class _LoginInScreenState extends State<LoginInScreen> {
                     //const SizedBox(height: 10,),
                     //Image.asset('assets/images/signupmod.png'),
                     const SizedBox(height: 10),
-                       customTextField('Email or Phone', fullNameController, Icons.person),
+                       customTextField(
+                           'Email or Phone',
+                           fullNameController,
+                           Icons.person,
+                           [
+                             FilteringTextInputFormatter.allow(RegExp( r"[a-zA-Z0-9.@]+")), // Allow only alphabets and space
+                       ]),
                     const SizedBox(height: 10),
-                    customTextField('Password', passwordController, Icons.password),
+                    TextField(
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z0-9.!@#\$%&'*+-/=?^_`{|}~]")),
+                      ],
+                      controller: passwordController,
+                      obscureText: !isPasswordVisibility,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        enabledBorder: focusBorder(),
+                        focusedBorder: focusBorder(),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isPasswordVisibility = !isPasswordVisibility;
+                            });
+                          },
+                          icon: Icon(
+                            isPasswordVisibility ? Icons.visibility : Icons.visibility_off,
+                          ),),
+                        prefixIcon: Icon(
+                          Icons.password,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     ElevatedButton(
                       style: ButtonStyle(
@@ -159,7 +193,7 @@ class _LoginInScreenState extends State<LoginInScreen> {
                         
                         _setJWTToken();
                       },
-                      child:  const Text('LogIn ',style: TextStyle(color: Colors.white,fontSize: 20),),
+                      child:  const Text('Login ',style: TextStyle(color: Colors.white,fontSize: 20),),
                     ),
                   ],
                 ),

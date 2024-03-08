@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 
   OutlineInputBorder inputBorder() {
@@ -48,8 +49,9 @@ import 'package:flutter/material.dart';
     );
   }
 
-  Widget customTextField(String shownText, TextEditingController controller, IconData prefixIcon) {
+  Widget customTextField(String shownText, TextEditingController controller, IconData prefixIcon,List<TextInputFormatter> inputformatters) {
     return TextField(
+      inputFormatters: inputformatters,
       controller: controller,
       decoration: InputDecoration(
         labelText: shownText,

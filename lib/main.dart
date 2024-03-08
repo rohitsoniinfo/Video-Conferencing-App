@@ -1,4 +1,6 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:newapp/AboutPageScreen.dart';
+import 'package:newapp/ForgotPasswordScreen.dart';
 import 'package:newapp/LogInScreen.dart';
 import 'package:newapp/SignUpScreen.dart';
 import 'RandomCall.dart';
