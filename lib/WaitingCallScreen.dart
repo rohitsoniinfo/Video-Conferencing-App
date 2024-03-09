@@ -8,8 +8,9 @@ import 'package:newapp/VideoCallPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WaitingCallScreen extends StatefulWidget {
-   // WaitingCallScreen({required this.connectingString});
+   WaitingCallScreen({required this.gender});
    // String connectingString;
+  final String gender;
   @override
   State<WaitingCallScreen> createState() => _WaitingCallScreenState();
 }
@@ -38,6 +39,7 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
       // Join a channel.
       showMessage("Token received, joining a channel...");
     }
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -90,7 +92,8 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
   }
 
   Future<void> getData() async {
-    kFetchingChannelUrl = "/api/User/${userId.toString()}?gender=male";
+    print("printing the gender inside the waiting call screen: ${widget.gender}");
+    kFetchingChannelUrl = "/api/User/${userId.toString()}?gender=${widget.gender}";
     final response = await http.get(
         Uri.parse(kApiUrlLink + kFetchingChannelUrl),
         headers: {'Authorization': 'Bearer $JWTToken', 'Content-Type': 'application/json', // Adjust content type if needed
@@ -129,11 +132,19 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
      print("jwtToken inside the WaitingCallScreen : $JWTToken");
      print("printing the userId inside WaitingCallScreen : $userId");
    }
+
+   void testingMethod() async
+   {
+     final prefs = await SharedPreferences.getInstance();
+     print("printing the JWTToken inside the testingMethod: ${prefs.getString('JWTToken')}");
+   }
+
   @override
   void initState() {
+    testingMethod();
     method();
+    print("printing the jwt token inside the initstate: $JWTToken");
   }
-
 
 
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =

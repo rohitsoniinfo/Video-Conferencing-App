@@ -13,7 +13,7 @@ class panel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //return createChannelPage();
-    return RandomCall();
+    return AppInitializer();
   }
 }
 

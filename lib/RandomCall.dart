@@ -51,6 +51,7 @@ class _RandomCallState extends State<RandomCall> {
       _password = widget.password;
     });
   }
+
   printUserSavedData() async
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -69,6 +70,8 @@ class _RandomCallState extends State<RandomCall> {
       _password = prefs.getString('password');
     });
   }
+
+
   @override
   void initState()  {
     _firstTimeGetSignupData();
@@ -389,7 +392,7 @@ class _RandomCallState extends State<RandomCall> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => WaitingCallScreen(),
+                          builder: (context) => WaitingCallScreen(gender: dropdownValue,),
                         ),
                       );
                     },

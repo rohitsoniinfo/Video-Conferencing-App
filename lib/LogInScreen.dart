@@ -183,15 +183,16 @@ class _LoginInScreenState extends State<LoginInScreen> {
                       onPressed: ()  async {
                         print("clicked login button");
                         await _postLoginDAta();
+                        _setJWTToken();
+                        print("jwtToken : $JWTToken");
                            Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => RandomCall(),
                             ),
                           );
-                        print("jwtToken : $JWTToken");
-                        
-                        _setJWTToken();
+
+
                       },
                       child:  const Text('Login ',style: TextStyle(color: Colors.white,fontSize: 20),),
                     ),
