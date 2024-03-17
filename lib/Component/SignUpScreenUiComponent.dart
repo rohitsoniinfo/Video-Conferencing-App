@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
   OutlineInputBorder inputBorder() {
     //return type is OutlineInputBorder
     return const OutlineInputBorder(
@@ -34,7 +33,11 @@ import 'package:flutter/services.dart';
               height: 80,
               decoration: BoxDecoration(
                   color: isTop == true ? Colors.blue : Colors.red,
-                  borderRadius: leftBorder),
+                  borderRadius: leftBorder,
+                boxShadow: const  [
+                  BoxShadow(blurRadius: 10)
+                ]
+              ),
             )),
         Align(
             alignment: Alignment.topRight,
@@ -43,7 +46,12 @@ import 'package:flutter/services.dart';
               height: 80,
               decoration: BoxDecoration(
                   color: isTop == true ? Colors.red : Colors.blue,
-                  borderRadius: rightBorder),
+                  borderRadius: rightBorder,
+                  boxShadow: const [
+                    BoxShadow(blurRadius: 10)
+                  ]
+              ),
+
             )),
       ],
     );

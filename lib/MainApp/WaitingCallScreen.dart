@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:newapp/VideoCallPage.dart';
+import 'package:newapp/MainApp/VideoCallPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WaitingCallScreen extends StatefulWidget {
@@ -81,7 +81,6 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
   Future<void> join() async {
     //await agoraEngine.startPreview(); // Uncomment if required
     channelName = fetchedConnectingString!; // Assuming fetchedConnectingString is not null here
-
     if (channelName.isEmpty) {
       print("Connecting string is empty.");
       return;
@@ -203,45 +202,23 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
       onTap: () => FocusScope.of(context).requestFocus(_unfocusNode),
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.red,
-          surfaceTintColor: Colors.red,
-          title: Text(
-            'Random Video Call',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        ),
+        appBar: kAppBar,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(height: 20,),
-            Image.asset(
-              'assets/images/videocallimage.png',
-            ),
-            Column(
-              children: [
-                LinearProgressIndicator(minHeight: 40,borderRadius: BorderRadius.circular(20),color: Colors.red,),
-                SizedBox(height: 20,),
-                Padding(
-                  padding:  EdgeInsets.fromLTRB(0, 0, 0, 25),
-                  child: Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VideoCallPage(token: token, channelName: channelName, isMicEnabled: true, isVideoEnabled: true),
-                          ),
-                        );
-                      },
-                      child: Text('Let\s go to Video Call Page'),
-                    ),
-                  ),
+            Container(
+              height: 300,
+              //width: double.infinity,
+              child: FittedBox(
+                fit: BoxFit.fill,
+                child: Image.asset(
+                  'assets/images/phoneVideoCalling.gif',
                 ),
-              ],
+              ),
             ),
+            LinearProgressIndicator(minHeight: 40,borderRadius: BorderRadius.circular(20),color: kAppThemeColor,),
+            SizedBox(height: 20,),
           ],
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:newapp/Component/SignUpScreenUiComponent.dart';
+
 class AboutPageScreen extends StatelessWidget {
   const AboutPageScreen({super.key});
 

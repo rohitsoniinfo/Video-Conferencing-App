@@ -5,9 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:newapp/utils/AgoraUser.dart';
 import 'package:newapp/Component/CallActionUi.dart';
-import 'package:newapp/VideoLayout.dart' as VL;
+import 'package:newapp/MainApp/VideoLayout.dart' as VL;
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
+
 
 class VideoCallPage extends StatefulWidget {
   const VideoCallPage({
@@ -34,15 +35,12 @@ class _VideoCallPageState extends State<VideoCallPage> {
   late final RtcEngine _agoraEngine;
   late final _users = <AgoraUser>{};
   late double _viewAspectRatio;
-
-  int? _currentUid = 0 ;
-
+  int? _currentUid = 0;
   bool _isMicEnabled = true;
-
   bool _isVideoEnabled = true;
 
-  bool _isLocalMicEnabled = true;
 
+  bool _isLocalMicEnabled = true;
   bool _isLocalVideoEnabled = true;
 
   int? _remoteUid;
@@ -54,106 +52,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
       content: Text(message),
     ));
   }
-  
-
-  //Initialize the Agora RTC Engine
-  Future<void> _initAgoraRtcEngine() async {
-    //_agoraEngine = await RtcEngine.create(widget.appId);
-    await [Permission.microphone, Permission.camera].request();
-    _agoraEngine = createAgoraRtcEngine();
-
-    // VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
-    // configuration.orientationMode = VideoOutputOrientationMode.Adaptative;
-    // await _agoraEngine.setVideoEncoderConfiguration(configuration);
-    // await _agoraEngine.enableAudio();
-    // await _agoraEngine.enableVideo();
-    // await _agoraEngine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    // await _agoraEngine.setClientRole(ClientRole.Broadcaster);
-    // await _agoraEngine.muteLocalAudioStream(!widget.isMicEnabled);
-    // await _agoraEngine.muteLocalVideoStream(!widget.isVideoEnabled);
-
-    await _agoraEngine.initialize(const RtcEngineContext(
-        appId: 'aaff3a381e23485090d0ae05ddc8ada1'
-    ));
-    //await _agoraEngine.enableLocalVideo(true);
-    await _agoraEngine.enableVideo();
-    //await _agoraEngine.muteLocalAudioStream(false);
-    await _agoraEngine.muteLocalVideoStream(false);
-    //await agoraEngine.disableAudio();
-    await _agoraEngine.enableAudio();
-    await _agoraEngine.enableLocalVideo(true);
-    await _agoraEngine.startPreview();
-  }
-
-//Call Initialization Function
-  Future<void> _initialize() async {
-    // Set aspect ratio for video according to platform
-    if (kIsWeb) {
-      _viewAspectRatio = 3 / 2;
-    }
-    else if (Platform.isAndroid || Platform.isIOS) {
-      _viewAspectRatio = 2 / 3;
-    }
-    else {
-      _viewAspectRatio = 3 / 2;
-    }
-    // Initialize microphone and camera
-    setState(() {
-      _isMicEnabled = widget.isMicEnabled;
-      _isVideoEnabled = widget.isVideoEnabled;
-    });
-    await _initAgoraRtcEngine();
-    _addAgoraEventHandlers();
-    // final options = ChannelMediaOptions(
-    //   // publishLocalAudio: _isMicEnabled,
-    //   // publishLocalVideo: _isVideoEnabled,
-    // );
-    ChannelMediaOptions options = const ChannelMediaOptions(
-      clientRoleType: ClientRoleType.clientRoleBroadcaster,
-      channelProfile: ChannelProfileType.channelProfileCommunication,
-    );
-    // Join the channel
-    // await _agoraEngine.joinChannel(
-    //   widget.token,
-    //   widget.channelName,
-    //   null, // optionalInfo (unused)
-    //   0, // User ID
-    //   options,
-    // );
-    await _agoraEngine.joinChannel(
-      token: widget.token,
-      channelId: widget.channelName,
-      uid: 0,
-      options: options,
-    );
-  }
 
 
-  @override
-  void initState()
-  {
-    print("did you recieve token : " );
-    print(widget.token);
-    _initialize();
-    super.initState();
-  }
-  //dispose agoara
-  @override
-  void dispose() {
-    _users.clear();
-    _disposeAgora();
-    super.dispose();
-  }
-
-  Future<void> _disposeAgora() async {
-    await _agoraEngine.leaveChannel();
-    //await _agoraEngine.destroy();
-    await _agoraEngine.release(sync: true);
-  }
-
-
-  //Setup Agora Event Handlers
-  // void _addAgoraEventHandlers() => _agoraEngine.setEventHandler(
   void _addAgoraEventHandlers() =>
       _agoraEngine.registerEventHandler(
         RtcEngineEventHandler(
@@ -183,7 +83,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
               );
             });
           },
-
           //     firstLocalAudioFrame: (elapsed) {
           //       final info = 'LOG::firstLocalAudio: $elapsed';
           //       debugPrint(info);
@@ -254,6 +153,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
               );
             });
           },
+
           //     userOffline: (uid, elapsed) {
           //       final info = 'LOG::userOffline: $uid';
           //       debugPrint(info);
@@ -265,6 +165,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
           //       }
           //       setState(() => _users.remove(userToRemove));
           //     },
+
           onUserOffline: (RtcConnection connection, int remoteUid,
               UserOfflineReasonType reason) {
             showMessage("Remote user uid:$remoteUid left the channel");
@@ -279,6 +180,34 @@ class _VideoCallPageState extends State<VideoCallPage> {
               Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
             });
           },
+
+          onUserMuteVideo: (RtcConnection connection, int remoteUid, bool isRemoteVideo )
+          {
+            setState(() {
+              for (AgoraUser user in _users) {
+                if (user.uid == remoteUid) {
+                  setState(() => user.isVideoEnabled = !isRemoteVideo );
+                }
+              }
+            });
+          },
+
+            onUserMuteAudio: (RtcConnection connection, int remoteUid, bool isRemoteAudio)
+            {
+              setState(() {
+                for(AgoraUser user in _users)
+                  {
+                    if(user.uid == remoteUid)
+                      {
+                        setState(() {
+                          user.isAudioEnabled = !isRemoteAudio;
+                        });
+                      }
+                  }
+              });
+            }
+
+
           //     firstRemoteAudioFrame: (uid, elapsed) {
           //       final info = 'LOG::firstRemoteAudio: $uid';
           //       debugPrint(info);
@@ -288,8 +217,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
           //         }
           //       }
           //     },
-
-
           //     firstRemoteVideoFrame: (uid, width, height, elapsed) {
           //       final info = 'LOG::firstRemoteVideo: $uid ${width}x $height';
           //       debugPrint(info);
@@ -330,30 +257,86 @@ class _VideoCallPageState extends State<VideoCallPage> {
           //         }
           //       }
           //     },
-
         ),
       );
 
+  Future<void> _initAgoraRtcEngine() async {
+    //_agoraEngine = await RtcEngine.create(widget.appId);
+    await [Permission.microphone, Permission.camera].request();
+    _agoraEngine = createAgoraRtcEngine();
+    // VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
+    // configuration.orientationMode = VideoOutputOrientationMode.Adaptative;
+    // await _agoraEngine.setVideoEncoderConfiguration(configuration);
+    // await _agoraEngine.enableAudio();
+    // await _agoraEngine.enableVideo();
+    // await _agoraEngine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    // await _agoraEngine.setClientRole(ClientRole.Broadcaster);
+    // await _agoraEngine.muteLocalAudioStream(!widget.isMicEnabled);
+    // await _agoraEngine.muteLocalVideoStream(!widget.isVideoEnabled);
+    await _agoraEngine.initialize(const RtcEngineContext(
+        appId: 'aaff3a381e23485090d0ae05ddc8ada1'
+    ));
+    //await _agoraEngine.enableLocalVideo(true);
+    await _agoraEngine.enableVideo();
+    //await _agoraEngine.muteLocalAudioStream(false);
 
-  Future<void> _onCallEnd(BuildContext context) async {
-    await _agoraEngine.leaveChannel();
-    if (context.mounted) {
-      // Navigator.of(context).pop();
-      int count = 0;
-      Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
-    }
+    await _agoraEngine.muteLocalVideoStream(false);
+
+    //await agoraEngine.disableAudio();
+    await _agoraEngine.enableAudio();
+    await _agoraEngine.enableLocalVideo(true);
+    await _agoraEngine.startPreview();
   }
 
-  void _onToggleAudio() {
+  Future<void> _initialize() async {
+    // Set aspect ratio for video according to platform
+    if (kIsWeb) {
+      _viewAspectRatio = 3 / 2;
+    }
+    else if (Platform.isAndroid || Platform.isIOS) {
+      _viewAspectRatio = 2 / 3;
+    }
+    else {
+      _viewAspectRatio = 3 / 2;
+    }
+    // Initialize microphone and camera
     setState(() {
-      _isLocalMicEnabled = !_isLocalMicEnabled;
-      for (AgoraUser user in _users) {
-        if (user.uid == 0) { //_currentUid
-          user.isAudioEnabled = _isLocalMicEnabled;
-        }
-      }
+      _isMicEnabled = widget.isMicEnabled;
+      _isVideoEnabled = widget.isVideoEnabled;
     });
-    _agoraEngine.muteLocalAudioStream(!_isLocalMicEnabled);
+    await _initAgoraRtcEngine();
+    _addAgoraEventHandlers();
+    // final options = ChannelMediaOptions(
+    //   // publishLocalAudio: _isMicEnabled,
+    //   // publishLocalVideo: _isVideoEnabled,
+    // );
+    ChannelMediaOptions options = const ChannelMediaOptions(
+      clientRoleType: ClientRoleType.clientRoleBroadcaster,
+      channelProfile: ChannelProfileType.channelProfileCommunication,
+    );
+    // Join the channel
+    // await _agoraEngine.joinChannel(
+    //   widget.token,
+    //   widget.channelName,
+    //   null, // optionalInfo (unused)
+    //   0, // User ID
+    //   options,
+    // );
+    await _agoraEngine.joinChannel(
+      token: widget.token,
+      channelId: widget.channelName,
+      uid: 0,
+      options: options,
+    );
+  }
+
+  @override
+  void initState()
+  {
+    print("did you recieve token : " );
+    print(widget.token);
+    _initialize();
+    super.initState();
   }
 
   void _onToggleCamera() {
@@ -366,16 +349,44 @@ class _VideoCallPageState extends State<VideoCallPage> {
           print("_currentUid : ");
           print(_currentUid);
           setState(() => user.isVideoEnabled = _isLocalVideoEnabled);
-
         }
       }
     });
-    _agoraEngine.muteLocalVideoStream(!_isVideoEnabled);
+    _agoraEngine.muteLocalVideoStream(!_isLocalVideoEnabled);
   }
 
+  //dispose agoara
+  @override
+  void dispose() {
+    _users.clear();
+    _disposeAgora();
+    super.dispose();
+  }
+  Future<void> _disposeAgora() async {
+    await _agoraEngine.leaveChannel();
+    //await _agoraEngine.destroy();
+    await _agoraEngine.release(sync: true);
+  }
+  Future<void> _onCallEnd(BuildContext context) async {
+    await _agoraEngine.leaveChannel();
+    if (context.mounted) {
+      // Navigator.of(context).pop();
+      int count = 0;
+      Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
+    }
+  }
+  void _onToggleAudio() {
+    setState(() {
+      _isLocalMicEnabled = !_isLocalMicEnabled;
+      for (AgoraUser user in _users) {
+        if (user.uid == 0) { //_currentUid
+          user.isAudioEnabled = _isLocalMicEnabled;
+        }
+      }
+    });
+    _agoraEngine.muteLocalAudioStream(!_isLocalMicEnabled);
+  }
   void _onSwitchCamera() => _agoraEngine.switchCamera();
-
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -388,28 +399,28 @@ class _VideoCallPageState extends State<VideoCallPage> {
             backgroundColor: Colors.black,
             surfaceTintColor: Colors.black,
             centerTitle: false,
-            title: Row(
+            title: const  Row(
               children: [
-                const Icon(
+                 Icon(
                   Icons.meeting_room_rounded,
                   color: Colors.white54,
                 ),
-                const SizedBox(width: 6.0),
-                const Text(
-                  'Channel name: ',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 16.0,
-                  ),
-                ),
-                Text(
-                  widget.channelName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                SizedBox(width: 6.0),
+                // const Text(
+                //   'Channel name: ',
+                //   style: TextStyle(
+                //     color: Colors.white54,
+                //     fontSize: 16.0,
+                //   ),
+                // ),
+                // Text(
+                //   widget.channelName,
+                //   style: const TextStyle(
+                //     color: Colors.white,
+                //     fontSize: 16.0,
+                //     fontWeight: FontWeight.bold,
+                //   ),
+                // ),
               ],
             ),
             actions: [
@@ -483,7 +494,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
     );
   }
 
-
   List<int> _createLayout(int n) {
     int rows = (sqrt(n).ceil());
     int columns = (n / rows).ceil();
@@ -497,3 +507,4 @@ class _VideoCallPageState extends State<VideoCallPage> {
     return layout;
   }
 }
+
