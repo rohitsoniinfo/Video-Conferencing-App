@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:newapp/MainApp/CallEndedScreen.dart';
 import 'package:newapp/utils/AgoraUser.dart';
 import 'package:newapp/Component/CallActionUi.dart';
 import 'package:newapp/MainApp/VideoLayout.dart' as VL;
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
-
 
 class VideoCallPage extends StatefulWidget {
   const VideoCallPage({
@@ -25,11 +25,9 @@ class VideoCallPage extends StatefulWidget {
   final bool isMicEnabled;
   final bool isVideoEnabled;
 
-
   @override
   State<VideoCallPage> createState() => _VideoCallPageState();
 }
-
 
 class _VideoCallPageState extends State<VideoCallPage> {
   late final RtcEngine _agoraEngine;
@@ -43,6 +41,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
   bool _isLocalMicEnabled = true;
   bool _isLocalVideoEnabled = true;
 
+  int _callDuration = 0;
+
   int? _remoteUid;
 
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<
@@ -52,7 +52,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
       content: Text(message),
     ));
   }
-
 
   void _addAgoraEventHandlers() =>
       _agoraEngine.registerEventHandler(
@@ -134,6 +133,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
             showMessage("Remote user uid:$remoteUid joined the channel");
             setState(() {
               _currentUid = remoteUid;
+              isUserJoined = true;
               print("printing remote uid : ");
               print(remoteUid);
               _users.add(
@@ -153,7 +153,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
               );
             });
           },
-
           //     userOffline: (uid, elapsed) {
           //       final info = 'LOG::userOffline: $uid';
           //       debugPrint(info);
@@ -165,7 +164,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
           //       }
           //       setState(() => _users.remove(userToRemove));
           //     },
-
           onUserOffline: (RtcConnection connection, int remoteUid,
               UserOfflineReasonType reason) {
             showMessage("Remote user uid:$remoteUid left the channel");
@@ -176,11 +174,12 @@ class _VideoCallPageState extends State<VideoCallPage> {
               _users.removeWhere((element) => element.uid == remoteUid);
               print("length of _users after removing: ");
               print(_users.length);
-              int count = 0;
-              Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
+              // int count = 0;
+              // Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CallEndedScreen(callDuration: _callDuration)), (route) => false);
+              //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => CallEndedScreen(callDuration: _callDuration)), (route) => false);
             });
           },
-
           onUserMuteVideo: (RtcConnection connection, int remoteUid, bool isRemoteVideo )
           {
             setState(() {
@@ -191,7 +190,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
               }
             });
           },
-
             onUserMuteAudio: (RtcConnection connection, int remoteUid, bool isRemoteAudio)
             {
               setState(() {
@@ -205,9 +203,22 @@ class _VideoCallPageState extends State<VideoCallPage> {
                       }
                   }
               });
-            }
-
-
+            },
+          onRtcStats: (RtcConnection connection, RtcStats stats)
+          {
+            setState(() {
+              print("printing the duration of call ${stats.duration}");
+              _callDuration = stats.duration!;
+              if(_callDuration == 590)
+                {
+                  showDialog(context: context, builder: (context) => AlertDialog(title: Text("your call is about to end."),));
+                }
+              if(_callDuration == 600)
+                {
+                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CallEndedScreen(callDuration: _callDuration)), (route) => false);
+                }
+            });
+          }
           //     firstRemoteAudioFrame: (uid, elapsed) {
           //       final info = 'LOG::firstRemoteAudio: $uid';
           //       debugPrint(info);
@@ -371,10 +382,25 @@ class _VideoCallPageState extends State<VideoCallPage> {
     await _agoraEngine.leaveChannel();
     if (context.mounted) {
       // Navigator.of(context).pop();
-      int count = 0;
-      Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
+      //int count = 0;
+     // Navigator.of(context).popUntil((_) => count++ >= 2); //this logic is for the
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CallEndedScreen(callDuration: _callDuration)), (route) => false);
     }
   }
+
+  bool isUserJoined = false;
+  Widget WaitingForAnotherUserScreen(){
+    return  SizedBox(
+      height: double.infinity,
+      child: FittedBox(
+        fit: BoxFit.fitHeight,
+        child: Image.asset(
+          'assets/images/cuteStar.gif',
+        ),
+      ),
+    );
+  }
+
   void _onToggleAudio() {
     setState(() {
       _isLocalMicEnabled = !_isLocalMicEnabled;
@@ -389,104 +415,116 @@ class _VideoCallPageState extends State<VideoCallPage> {
   void _onSwitchCamera() => _agoraEngine.switchCamera();
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      home: SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (value){
+        showDialog(context: context, builder: (context) =>  AlertDialog(title: Text("Do you want to disconnect the call?"),actions: [
+          TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("No")),
+          TextButton(onPressed: (){
+            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => CallEndedScreen(callDuration: _callDuration)), (route) => false);
+          },
+              child: const Text("Yes"))
+        ],));
+      },
+      child: MaterialApp(
+        scaffoldMessengerKey: scaffoldMessengerKey,
+        home: SafeArea(
+          child: Scaffold(
             backgroundColor: Colors.black,
-            surfaceTintColor: Colors.black,
-            centerTitle: false,
-            title: const  Row(
-              children: [
-                 Icon(
-                  Icons.meeting_room_rounded,
-                  color: Colors.white54,
-                ),
-                SizedBox(width: 6.0),
-                // const Text(
-                //   'Channel name: ',
-                //   style: TextStyle(
-                //     color: Colors.white54,
-                //     fontSize: 16.0,
-                //   ),
-                // ),
-                // Text(
-                //   widget.channelName,
-                //   style: const TextStyle(
-                //     color: Colors.white,
-                //     fontSize: 16.0,
-                //     fontWeight: FontWeight.bold,
-                //   ),
-                // ),
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.black,
+              surfaceTintColor: Colors.black,
+              centerTitle: false,
+              title: const  Row(
+                children: [
+                   Icon(
+                    Icons.meeting_room_rounded,
+                    color: Colors.white54,
+                  ),
+                  SizedBox(width: 6.0),
+                  // const Text(
+                  //   'Channel name: ',
+                  //   style: TextStyle(
+                  //     color: Colors.white54,
+                  //     fontSize: 16.0,
+                  //   ),
+                  // ),
+                  // Text(
+                  //   widget.channelName,
+                  //   style: const TextStyle(
+                  //     color: Colors.white,
+                  //     fontSize: 16.0,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                ],
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.people_alt_rounded,
+                        color: Colors.white54,
+                      ),
+                      const SizedBox(width: 6.0),
+                      Text(
+                        _users.length.toString(),
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.people_alt_rounded,
-                      color: Colors.white54,
-                    ),
-                    const SizedBox(width: 6.0),
-                    Text(
-                      _users.length.toString(),
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 16.0,
+            body: SafeArea(
+              child: isUserJoined ? Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: OrientationBuilder(
+                        builder: (context, orientation) {
+                          final isPortrait = orientation == Orientation.portrait;
+                          if (_users.isEmpty) {
+                            return const SizedBox();
+                          }
+                          WidgetsBinding.instance.addPostFrameCallback(
+                                (_) =>
+                                setState(
+                                        () =>
+                                    _viewAspectRatio =
+                                    isPortrait ? 2 / 3 : 3 / 2),
+                          );
+                          final layoutViews = _createLayout(_users.length);
+                          return VL.AgoraVideoLayout(
+                            users: _users,
+                            views: layoutViews,
+                            viewAspectRatio: _viewAspectRatio,
+                          );
+                        },
                       ),
                     ),
-                  ],
-                ),
-              )
-            ],
-          ),
-          body: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: OrientationBuilder(
-                      builder: (context, orientation) {
-                        final isPortrait = orientation == Orientation.portrait;
-                        if (_users.isEmpty) {
-                          return const SizedBox();
-                        }
-                        WidgetsBinding.instance.addPostFrameCallback(
-                              (_) =>
-                              setState(
-                                      () =>
-                                  _viewAspectRatio =
-                                  isPortrait ? 2 / 3 : 3 / 2),
-                        );
-                        final layoutViews = _createLayout(_users.length);
-                        return VL.AgoraVideoLayout(
-                          users: _users,
-                          views: layoutViews,
-                          viewAspectRatio: _viewAspectRatio,
-                        );
-                      },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: CallActionsRow(
+                      isMicEnabled: _isLocalMicEnabled,
+                      isVideoEnabled: _isLocalVideoEnabled,
+                      onCallEnd: () => _onCallEnd(context),
+                      onToggleAudio: _onToggleAudio,
+                      onToggleCamera: _onToggleCamera,
+                      onSwitchCamera: _onSwitchCamera,
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: CallActionsRow(
-                    isMicEnabled: _isLocalMicEnabled,
-                    isVideoEnabled: _isLocalVideoEnabled,
-                    onCallEnd: () => _onCallEnd(context),
-                    onToggleAudio: _onToggleAudio,
-                    onToggleCamera: _onToggleCamera,
-                    onSwitchCamera: _onSwitchCamera,
-                  ),
-                ),
-              ],
+                ],
+              ) : WaitingForAnotherUserScreen(),
             ),
           ),
         ),

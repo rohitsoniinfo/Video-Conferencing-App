@@ -1,11 +1,19 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:newapp/LoginSignupFiles/LogInScreen.dart';
 import 'MainApp/RandomCall.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: panel()));
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  return runApp(
+      const MaterialApp(debugShowCheckedModeBanner: false, home: panel()));
+}
+
 class panel extends StatelessWidget {
   const panel({super.key});
   @override
@@ -23,8 +31,8 @@ class AppInitializer extends StatefulWidget {
 class _AppInitializerState extends State<AppInitializer> {
   bool _isUserLoggedin = false;
   @override
-  void initState()  {
-  _checkUserLoggedIn();
+  void initState() {
+    _checkUserLoggedIn();
     super.initState();
   }
   Future<void> _checkUserLoggedIn() async {
@@ -33,10 +41,11 @@ class _AppInitializerState extends State<AppInitializer> {
     setState(() {
       _isUserLoggedin = isUserLoggedin;
     });
-    print("isLoggedIn: inside the main  _checkUserLoggedIn() function : ${prefs.getBool('isLoggedIn')}");
+    print(
+        "isLoggedIn: inside the main  _checkUserLoggedIn() function : ${prefs.getBool('isLoggedIn')}");
   }
   @override
   Widget build(BuildContext context) {
-    return _isUserLoggedin ?  const RandomCall() : const LoginInScreen();
+    return _isUserLoggedin ? const RandomCall() : const LoginInScreen();
   }
 }

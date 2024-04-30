@@ -21,6 +21,16 @@ import 'package:flutter/services.dart';
         ));
   }
 
+  OutlineInputBorder errorBorder()
+  {
+    return  const OutlineInputBorder(
+        borderRadius:
+        BorderRadius.all(Radius.circular(20)),
+        borderSide: BorderSide(
+          color: Colors.red,
+          width: 3,
+        ));
+  }
   Widget TopBottomDesign(bool isTop, BorderRadiusGeometry leftBorder,
       BorderRadiusGeometry rightBorder) {
     return Row(

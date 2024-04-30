@@ -64,7 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             TextButton(
               onPressed: () async {
                 Navigator.of(ctx).pop();
-                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=> LoginInScreen()), (route) => false);
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=> const LoginInScreen()), (route) => false);
               },
               style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.lightBlueAccent)),
               child: const Text("Login Now",style: TextStyle(color: Colors.white),),
@@ -154,7 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           context: context,
           barrierDismissible: false,
           builder: (ctx) =>  AlertDialog(
-            title: Column(
+            title: const Column(
               mainAxisSize: MainAxisSize.max,
               children: [
                 Text('Already have an account or error'),
@@ -162,8 +162,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             content: TextButton(onPressed: ()  {
               Navigator.of(ctx).pop();
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginInScreen()), (route) => false);
-            }, child: Text("okay")),
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginInScreen()), (route) => false);
+            }, child: const Text("okay")),
           ),
         );
         // If the server returns an error response, throw an exception
@@ -193,10 +193,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           builder: (ctxi) {
             dContext = ctxi;
             return  AlertDialog(
-              title: Text('Incorrect OTP'),
+              title: const Text('Incorrect OTP'),
               content: TextButton(onPressed: (){
                 Navigator.of(dContext!).pop();
-              }, child: Text("okay")),
+              }, child: const Text("okay")),
             );
           }
       );
@@ -219,14 +219,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
               length: 5,
               width: MediaQuery.of(context).size.width,
               //fieldWidth: 40,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 17
               ),
               textFieldAlignment: MainAxisAlignment.spaceAround,
               fieldStyle: FieldStyle.box,
               onCompleted: (pin) {
                 enteredOtp = int.parse(pin);
-                print("Completed: " + pin);
+                print("Completed: $pin");
               },
             ),
             actions: <Widget>[
@@ -235,8 +235,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   await matchingOtpCreatingAccount();
                   //Navigator.of(context).pop();
                 },
-                child: Text("Verify OTP",style: TextStyle(color: Colors.white),),
                 style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.lightBlueAccent)),
+                child: const Text("Verify OTP",style: TextStyle(color: Colors.white),),
               ),
             ],
           ),
@@ -418,7 +418,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               controller: fullNameController,
                               decoration: InputDecoration(
                                 labelText: 'Full Name',
-                                labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                                 enabledBorder: inputBorder(),
                                 focusedBorder: focusBorder(),
                                 disabledBorder: focusBorder(),
@@ -442,14 +442,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             TextFormField(
                               autovalidateMode: AutovalidateMode.onUserInteraction,
                               validator: _validateEmail,
                               controller: emailController,
                               decoration: InputDecoration(
                                 labelText: 'Email',
-                                labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                                 enabledBorder: focusBorder(),
                                 focusedBorder: focusBorder(),
                                 disabledBorder: focusBorder(),
@@ -481,25 +481,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               controller: contactController,
                               decoration: InputDecoration(
                                 labelText: 'Contact',
-                                labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                                 enabledBorder: focusBorder(),
                                 focusedBorder: focusBorder(),
                                 disabledBorder: focusBorder(),
-                                focusedErrorBorder:  OutlineInputBorder(
+                                focusedErrorBorder:  const OutlineInputBorder(
                                     borderRadius: BorderRadius.all(Radius.circular(20)),
                                     borderSide: BorderSide(
                                       color:Colors.red,
                                       width: 3,
                                     )
                                 ),
-                                errorBorder: OutlineInputBorder(
+                                errorBorder: const OutlineInputBorder(
                                     borderRadius: BorderRadius.all(Radius.circular(20)),
                                     borderSide: BorderSide(
                                       color:Colors.red,
                                       width: 3,
                                     )
                                 ),
-                                prefixIcon: Icon(
+                                prefixIcon: const Icon(
                                   Icons.phone,
                                   color: Colors.black,
                                 ),
@@ -513,7 +513,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               controller: addressController,
                               decoration: InputDecoration(
                                 labelText: 'Address',
-                                labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                                 enabledBorder: focusBorder(),
                                 focusedBorder: focusBorder(),
                                 disabledBorder: focusBorder(),
@@ -543,7 +543,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               autovalidateMode: AutovalidateMode.onUserInteraction,
                               icon: const Icon(Icons.keyboard_arrow_down_rounded),
                               decoration: InputDecoration(
-                                labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                                 enabledBorder: focusBorder(),
                                 focusedBorder: focusBorder(),
                                 disabledBorder: focusBorder(),
@@ -559,10 +559,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     borderSide: BorderSide(
                                       color:Colors.red,
                                       width: 3,
-                                    )
+                                    ),
                                 ),
+                                prefixIcon: const Icon(
+                                  Icons.wc,
+                                )
                               ),
-                              hint:  Text('Select your gender',style: TextStyle(color: Colors.black),),
+                              hint:  const Text('Select your gender',style: TextStyle(color: Colors.black),),
                               dropdownColor: Colors.grey.shade200,
                               value: dropdownValue,
                               onChanged: (String? newValue) {
@@ -585,7 +588,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 );
                               }).toList(),
                             ),
-
                             const SizedBox(height: 10),
                           TextFormField(
                             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -597,7 +599,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             obscureText: !isPasswordVisibility,
                             decoration: InputDecoration(
                               labelText: 'Password',
-                              labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                              labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                               enabledBorder: inputBorder(),
                               focusedBorder: focusBorder(),
                               disabledBorder: focusBorder(),
@@ -642,7 +644,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         (states) => kAppThemeColor),
                                   ),
                                   onPressed: _signUpButtonPressed,
-                                  child:  Text(
+                                  child:  const Text(
                                     'Signup',
                                     style: TextStyle(color: Colors.white, fontSize: 20),
                                   ),

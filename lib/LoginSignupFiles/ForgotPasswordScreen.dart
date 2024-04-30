@@ -29,23 +29,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   bool isPasswordChangedSuccessfully = false;
 
-  Future<void> _emailVerificationOtpSend() async {
+  bool isOtpSentSuccessfully = false;
+  Future<bool> _emailVerificationOtpSend() async {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => const AlertDialog(
-        title: Text('Sending OTP...'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-          ],
+      builder: (ctx) => const PopScope(
+        canPop: false,
+        child:  AlertDialog(
+          title: Text('Sending OTP...'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+            ],
+          ),
         ),
       ),
     );
-    // Send the OTP after a brief delay to simulate network call
     await Future.delayed(const Duration(seconds: 2));
+
     print("email id entered: ${mailController.text}");
     try {
       final response = await http.post(
@@ -59,17 +63,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       );
       if (response.statusCode == 200) {
         Navigator.of(context).pop();
+        setState(() {
+          isOtpSentSuccessfully = true;
+        });
         print("OTP sent successfully.");
-      } else {
+        return true;
+      }
+      else {
         Navigator.of(context).pop();
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (ctx) =>  AlertDialog(
-            title: const Text('Coundn\'t send OTP or error.'),
+            title:  Text('Coundn\'t send OTP or error. ResponseCode: ${response.statusCode}'),
             content: TextButton(onPressed: (){
               Navigator.of(context).pop();
-            },child: Text("Okay"),),
+            },child: const Text("Okay"),),
           ),
         );
         // If the server returns an error response, throw an exception
@@ -81,15 +90,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         context: context,
         barrierDismissible: false,
         builder: (ctx) =>  AlertDialog(
-          title: const Text('Coundn\'t send OTP or error.'),
+          title:  Text('error. exception: $e'),
           content: TextButton(onPressed: (){
             Navigator.of(context).pop();
-          },child: Text("Okay"),),
+          },child: const Text("Okay"),),
         ),
       );
       setState(() {
         result = 'Error: $e';
       });
+      return false;
     }
   }
 
@@ -121,11 +131,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           context: context,
           barrierDismissible: false,
           builder: (ctx) =>  AlertDialog(
-            title: Text('Invalid OTP or error'),
+            title: const Text('Invalid OTP or error'),
             content: TextButton(
                 onPressed: (){
                   Navigator.of(context).pop();
-                }, child: Text("Okay")),
+                },
+                child: const Text("Okay")),
           ),
         );
         throw Exception('Failed to post data');
@@ -136,11 +147,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         context: context,
         barrierDismissible: false,
         builder: (ctx) =>  AlertDialog(
-          title: Text('Invalid OTP or error'),
+          title: const Text('Invalid OTP or error'),
           content: TextButton(
               onPressed: (){
                 Navigator.of(context).pop();
-              }, child: Text("Okay")),
+              }, child: const Text("Okay")),
         ),
       );
       setState(() {
@@ -215,33 +226,32 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               ),
                             ),
                           ),
-                         SizedBox(height: 10,),
+                         const SizedBox(height: 10,),
                           TextFormField(
                             autovalidateMode: AutovalidateMode.onUserInteraction,
                             validator: _validateEmail,
-                            //inputFormatters: [ FilteringTextInputFormatter.allow(RegExp( r"[a-zA-Z0-9.@]+")) ],
                             controller: mailController,
                             decoration: InputDecoration(
                               labelText: 'Email',
-                              labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                              labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                               enabledBorder: focusBorder(),
                               focusedBorder: focusBorder(),
                               disabledBorder: focusBorder(),
-                              focusedErrorBorder:  OutlineInputBorder(
+                              focusedErrorBorder:  const OutlineInputBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(20)),
                                   borderSide: BorderSide(
                                     color:Colors.red,
                                     width: 3,
                                   )
                               ),
-                              errorBorder: OutlineInputBorder(
+                              errorBorder: const OutlineInputBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(20)),
                                   borderSide: BorderSide(
                                     color:Colors.red,
                                     width: 3,
                                   )
                               ),
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.email,
                                 color: Colors.black,
                               ),
@@ -254,124 +264,125 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.resolveWith(
                                         (states) => kAppThemeColor),
-                                //fixedSize: MaterialStateProperty.resolveWith((states) => Size(100, 30))
                               ),
                               onPressed:  () async {
                                 if(_formKey.currentState!.validate())
                                 {
-                                  await _emailVerificationOtpSend();
-                                  await showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (ctx) =>
-                                        AlertDialog(
-                                          title: const Text("Enter the otp recieved ans set password."),
-                                          content:  SingleChildScrollView(
-                                            child: Form(
-                                              key: _otpPasswordFormKey,
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Padding(
-                                                    padding: EdgeInsets.all(16.0),
-                                                    child: Text("Enter your otp ",style: TextStyle(color: Colors.black, fontSize: 20)),
-                                                  ),
-                                                  OTPTextField(
-                                                    otpFieldStyle: OtpFieldStyle(
-                                                      enabledBorderColor: Colors.black,
-                                                      disabledBorderColor: Colors.blueGrey,
-                                                      errorBorderColor: Colors.red,
-                                                    ),
-                                                    length: 5,
-                                                    width: MediaQuery.of(context).size.width,
-                                                    //fieldWidth: 40,
-                                                    style: TextStyle(
-                                                        fontSize: 17
-                                                    ),
-                                                    textFieldAlignment: MainAxisAlignment.spaceAround,
-                                                    fieldStyle: FieldStyle.box,
-                                                    onCompleted: (pin) {
-                                                      enteredOtp = int.parse(pin);
-                                                      print("Completed: " + pin);
-                                                    },
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.all(16.0),
-                                                    child: Text("Enter your password ",style: TextStyle(color: Colors.black, fontSize: 20)),
-                                                  ),
-                                                  TextFormField(
-                                                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                                                    validator: validatorObj.passwordValidator,
-                                                    inputFormatters: validatorObj.passwordFormatter,
-                                                    controller: passwordController,
-                                                    obscureText: isPasswordVisibility,
-                                                    decoration: InputDecoration(
-                                                      labelText: 'Password',
-                                                      labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                                                      enabledBorder: inputBorder(),
-                                                      focusedBorder: focusBorder(),
-                                                      disabledBorder: focusBorder(),
-                                                      focusedErrorBorder:  OutlineInputBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                                                          borderSide: BorderSide(
-                                                            color:Colors.red,
-                                                            width: 3,
-                                                          )
+                                  if(await _emailVerificationOtpSend())
+                                    {
+                                      await showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (ctx) =>
+                                            AlertDialog(
+                                              title: const Text("Enter the otp recieved and set password"),
+                                              content:  SingleChildScrollView(
+                                                child: Form(
+                                                  key: _otpPasswordFormKey,
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      const Padding(
+                                                        padding: EdgeInsets.all(16.0),
+                                                        child: Text("Enter your otp ",style: TextStyle(color: Colors.black, fontSize: 20)),
                                                       ),
-                                                      errorBorder: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                                                          borderSide: BorderSide(
-                                                            color:Colors.red,
-                                                            width: 3,
-                                                          )
-                                                      ),
-                                                      suffixIcon: IconButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            isPasswordVisibility = !isPasswordVisibility;
-                                                          });
+                                                      OTPTextField(
+                                                        otpFieldStyle: OtpFieldStyle(
+                                                          enabledBorderColor: Colors.black,
+                                                          disabledBorderColor: Colors.blueGrey,
+                                                          errorBorderColor: Colors.red,
+                                                        ),
+                                                        length: 5,
+                                                        width: MediaQuery.of(context).size.width,
+                                                        //fieldWidth: 40,
+                                                        style: const TextStyle(
+                                                            fontSize: 17
+                                                        ),
+                                                        textFieldAlignment: MainAxisAlignment.spaceAround,
+                                                        fieldStyle: FieldStyle.box,
+                                                        onCompleted: (pin) {
+                                                          enteredOtp = int.parse(pin);
+                                                          print("Completed: $pin");
                                                         },
-                                                        icon: Icon(
-                                                          isPasswordVisibility ? Icons.visibility : Icons.visibility_off,
-                                                        ),),
-                                                      prefixIcon: Icon(
-                                                        Icons.password ,
-                                                        color: Colors.black,
                                                       ),
-                                                    ),
+                                                      const Padding(
+                                                        padding: EdgeInsets.all(16.0),
+                                                        child: Text("Enter your password ",style: TextStyle(color: Colors.black, fontSize: 20)),
+                                                      ),
+                                                      TextFormField(
+                                                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                                                        validator: validatorObj.passwordValidator,
+                                                        inputFormatters: validatorObj.passwordFormatter,
+                                                        controller: passwordController,
+                                                        obscureText: isPasswordVisibility,
+                                                        decoration: InputDecoration(
+                                                          labelText: 'Password',
+                                                          labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                                          enabledBorder: inputBorder(),
+                                                          focusedBorder: focusBorder(),
+                                                          disabledBorder: focusBorder(),
+                                                          focusedErrorBorder:  const OutlineInputBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                                                              borderSide: BorderSide(
+                                                                color:Colors.red,
+                                                                width: 3,
+                                                              )
+                                                          ),
+                                                          errorBorder: const OutlineInputBorder(
+                                                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                                                              borderSide: BorderSide(
+                                                                color:Colors.red,
+                                                                width: 3,
+                                                              )
+                                                          ),
+                                                          suffixIcon: IconButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                isPasswordVisibility = !isPasswordVisibility;
+                                                              });
+                                                            },
+                                                            icon: Icon(
+                                                              isPasswordVisibility ? Icons.visibility : Icons.visibility_off,
+                                                            ),),
+                                                          prefixIcon: const Icon(
+                                                            Icons.password ,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
+                                                ),
                                               ),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    if(_otpPasswordFormKey.currentState!.validate())
+                                                    {
+                                                      await _verifyOtpChangePassword();
+                                                      Navigator.of(ctx).pop();
+                                                    }
+                                                  },
+                                                  style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.lightBlueAccent)),
+                                                  child: const Text("Verify OTP and Set password",style: TextStyle(color: Colors.white),),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () async {
-                                                if(_otpPasswordFormKey.currentState!.validate())
-                                                {
-                                                  await _verifyOtpChangePassword();
-                                                  Navigator.of(ctx).pop();
-                                                }
-                                              },
-                                              child: Text("Verify OTP and Set password",style: TextStyle(color: Colors.white),),
-                                              style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.lightBlueAccent)),
-                                            ),
-                                          ],
-                                        ),
-                                  );
+                                      );
+                                    }
                                   if(isPasswordChangedSuccessfully)
                                   {
                                     showDialog(context: context, builder: (ctx) => AlertDialog(
-                                      title: Text('Your password is updated successfully.'),
+                                      title: const Text('Your password is updated successfully.'),
                                       actions: [
                                         TextButton(
                                           onPressed: ()  {
-                                            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => LoginInScreen()), (route) => false);
+                                            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const LoginInScreen()), (route) => false);
                                             //Navigator.of(ctx).pop();
                                           },
-                                          child: Text("Login Again.",style: TextStyle(color: Colors.white),),
                                           style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.lightBlueAccent)),
+                                          child: const Text("Login Again.",style: TextStyle(color: Colors.white),),
                                         ),
                                       ],
                                     ));
@@ -391,11 +402,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
               ),
             ),
-            // TopBottomDesign(
-            //   true,
-            //   const BorderRadius.only(topRight: Radius.circular(200)),
-            //   const BorderRadius.only(topLeft: Radius.circular(200)),
-            // ),
           ],
         ),
       ),

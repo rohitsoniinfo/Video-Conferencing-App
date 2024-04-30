@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:newapp/Component/SignUpScreenUiComponent.dart';
 import 'package:newapp/LoginSignupFiles/ForgotPasswordScreen.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -32,7 +32,7 @@ class _LoginInScreenState extends State<LoginInScreen> {
   String? JWTToken;
   int? userId;
 
-  _setJWTToken() async
+  Future<void> _setJWTToken() async
   {
     final refs = await SharedPreferences.getInstance();
     refs.setString('JWTToken', JWTToken!);
@@ -40,15 +40,16 @@ class _LoginInScreenState extends State<LoginInScreen> {
   }
 
 
-  _saveUserDataFirstTime() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('userId', userDetails.userId!);
-    prefs.setString('name', userDetails.name!);
-    prefs.setString('email', userDetails.email!);
-    prefs.setString('contact', userDetails.contact!);
-    prefs.setString('address', userDetails.address!);
-    prefs.setString('gender', userDetails.gender!);
-    prefs.setString('password', userDetails.password!);
+  Future<void> _saveUserDataFirstTime() async {
+    final prefs = await SharedPreferences.getInstance();
+     prefs.setInt('userId', userDetails.userId ?? -1);
+     prefs.setString('name', userDetails.name ?? "name");
+     prefs.setString('email', userDetails.email ?? "email");
+     prefs.setString('contact', userDetails.contact ?? "123456789");
+     prefs.setString('address', userDetails.address ?? "address");
+     prefs.setString('gender', userDetails.gender ?? "gender");
+     prefs.setString('password', userDetails.password ?? "");
+     print("printing the userId while saving it: ${prefs.getInt('userId')}");
   }
 
   Future<void> _postLoginDAta() async {
@@ -82,20 +83,18 @@ class _LoginInScreenState extends State<LoginInScreen> {
       );
 
       if (response.statusCode == 200) {
-
         // Successful POST request, handle the response here
         final responseData = jsonDecode(response.body);
         print(responseData);
         setState(() {
-          result = 'Name: ${responseData['username']}\n'
+          result = 'Name: ${responseData['name']}\n'
               'Id: ${responseData['id']}\n'
               'Token : ${responseData['jwtToken']} \n ';
-          userId = responseData['id'];
+          userId = responseData['userdata']['id'];
           JWTToken = responseData['jwtToken'];
           print("jwtToken bc : $JWTToken");
           print(result);
-          print(JWTToken);
-
+          print("printing the user id of project : $userId");
           userDetails.userId = responseData['userdata']['id'];
           userDetails.name = responseData['userdata']['name'];
           userDetails.email = responseData['userdata']['email'];
@@ -103,8 +102,8 @@ class _LoginInScreenState extends State<LoginInScreen> {
           userDetails.address = responseData['userdata']['address'];
           userDetails.gender = responseData['userdata']['gender'];
           userDetails.password = responseData['userdata']['password'];
+          print("after saving the userId inside the object, userId ${userDetails.userId}");
           Navigator.of(context).pop();
-
         });
       }
       else
@@ -247,20 +246,8 @@ class _LoginInScreenState extends State<LoginInScreen> {
                               enabledBorder: focusBorder(),
                               focusedBorder: focusBorder(),
                               disabledBorder: focusBorder(),
-                              focusedErrorBorder:   OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(20/752*height)),
-                                  borderSide: BorderSide(
-                                    color:Colors.red,
-                                    width: 3,
-                                  ),
-                              ),
-                              errorBorder: const  OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                                  borderSide: BorderSide(
-                                    color:Colors.red,
-                                    width: 3,
-                                  ),
-                              ),
+                              focusedErrorBorder:   errorBorder(),
+                              errorBorder: errorBorder(),
                               prefixIcon: const Icon(
                                 Icons.person,
                                 color: Colors.black,
@@ -314,7 +301,7 @@ class _LoginInScreenState extends State<LoginInScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ForgotPasswordScreen(),
+                                    builder: (context) => const ForgotPasswordScreen(),
                                   ),
                                 );
                               },
@@ -330,16 +317,16 @@ class _LoginInScreenState extends State<LoginInScreen> {
                               onPressed: ()  async {
                                 if(_formKey.currentState!.validate())
                                 {
-                                  print("it's a valid form. ");
                                   print("clicked login button");
                                   await _postLoginDAta();
                                   await _saveUserDataFirstTime();
                                   await _setUserLoggedIn();
                                   await _setJWTToken();
                                   print("jwtToken : $JWTToken");
-                                  if(userId!=null) {
-                                    await _setUserLoggedIn();
-                                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => RandomCall()), (route) => false);
+                                  print("inside the userId inside the formc click block of the code: $userId");
+                                  if(userId != null) {
+                                      await _setUserLoggedIn();
+                                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const RandomCall()), (route) => false);
                                   }
                                 }
                               },
@@ -374,11 +361,6 @@ class _LoginInScreenState extends State<LoginInScreen> {
               ),
             ),
             SizedBox(height: 34/752*height,),
-            // TopBottomDesign(
-            //     false,
-            //     BorderRadius.only(topRight: Radius.circular(200/752*height),),
-            //     BorderRadius.only(topLeft: Radius.circular(200/752*height),),
-            //     ),
           ],
         ),
       ),

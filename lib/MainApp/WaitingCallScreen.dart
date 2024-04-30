@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:newapp/constant.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -8,7 +11,7 @@ import 'package:newapp/MainApp/VideoCallPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WaitingCallScreen extends StatefulWidget {
-   WaitingCallScreen({required this.gender});
+   const WaitingCallScreen({super.key, required this.gender});
    // String connectingString;
   final String gender;
   @override
@@ -156,7 +159,6 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
 
 
   final _formKey = GlobalKey<FormState>();
-  @override
   late final FocusNode _unfocusNode;
 
   String? _channelNameValidator(value) {
@@ -203,23 +205,25 @@ class _WaitingCallScreenState extends State<WaitingCallScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: kAppBar,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(height: 20,),
-            Container(
-              height: 300,
-              //width: double.infinity,
-              child: FittedBox(
-                fit: BoxFit.fill,
-                child: Image.asset(
-                  'assets/images/phoneVideoCalling.gif',
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+               Container(
+                 color: Colors.red,
+                height: 500,
+                child: FittedBox(
+                  fit: BoxFit.fitHeight,
+                  child: Image.asset(
+                    'assets/images/boyGirlCalling.gif',
+                  ),
                 ),
               ),
-            ),
-            LinearProgressIndicator(minHeight: 40,borderRadius: BorderRadius.circular(20),color: kAppThemeColor,),
-            SizedBox(height: 20,),
-          ],
+              const Text("Initiating your call...",style: TextStyle(color: Colors.black, fontSize: 25,fontWeight: FontWeight.bold),),
+              //const CircularProgressIndicator(),
+              //const SizedBox(height: 20,),
+            ],
+          ),
         ),
       ),
     );

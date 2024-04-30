@@ -9,7 +9,7 @@ class AboutPageScreen extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.blueAccent,
-            title: Text('About Us',style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),),
+            title: const Text('About Us',style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),),
             centerTitle: true,
           ),
           body: SingleChildScrollView(
@@ -36,12 +36,13 @@ class AboutPageScreen extends StatelessWidget {
                   color: Colors.grey,
                   child: Column(
                     children: [
-                      Container(
-                        child: Image.asset('assets/images/RohitSoni1.jpg'),
-                        decoration: BoxDecoration(
+                       Container(
+                        decoration: const  BoxDecoration(
                         shape: BoxShape.circle,
-                      ),),
-                      Text("Rohit Soni",style: TextStyle(color: Colors.white,fontSize: 40, fontWeight: FontWeight.bold,  ),),
+                      ),
+                        child:   Image.asset('assets/images/RohitSoni1.jpg'),
+                      ),
+                      const Text("Rohit Soni",style: TextStyle(color: Colors.white,fontSize: 40, fontWeight: FontWeight.bold,  ),),
                       const Padding(
                         padding: EdgeInsets.all(16.0),
                         child:  Text('Hi!, I am Rohit Soni (Frontend Developer). I am passionate about technologies such as App Development, Cyber Security. I love working on real life projects and turning my ideas into reality.',
@@ -60,11 +61,12 @@ class AboutPageScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Container(
-                        child: Image.asset('assets/images/RohitSoni1.jpg'),
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                        ),),
-                      Text("Rohit Soni",style: TextStyle(color: Colors.white,fontSize: 40, fontWeight: FontWeight.bold,  ),),
+                        ),
+                          child: Image.asset('assets/images/RohitSoni1.jpg'),
+                        ),
+                      const Text("Rohit Soni",style: TextStyle(color: Colors.white,fontSize: 40, fontWeight: FontWeight.bold,  ),),
                       const Padding(
                         padding: EdgeInsets.all(8.0),
                         child:  Text('Hi!, I am Rohit Soni (Frontend Developer). I am passionate about technologies such as App Development, Cyber Security. I love working on real life projects and turning my ideas into reality.',
