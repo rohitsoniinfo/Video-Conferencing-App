@@ -28,6 +28,7 @@ class AppInitializer extends StatefulWidget {
   @override
   State<AppInitializer> createState() => _AppInitializerState();
 }
+
 class _AppInitializerState extends State<AppInitializer> {
   bool _isUserLoggedin = false;
   @override
@@ -41,8 +42,7 @@ class _AppInitializerState extends State<AppInitializer> {
     setState(() {
       _isUserLoggedin = isUserLoggedin;
     });
-    print(
-        "isLoggedIn: inside the main  _checkUserLoggedIn() function : ${prefs.getBool('isLoggedIn')}");
+    print("isLoggedIn: inside the main  _checkUserLoggedIn() function : ${prefs.getBool('isLoggedIn')}");
   }
   @override
   Widget build(BuildContext context) {
