@@ -185,7 +185,7 @@ class _LoginInScreenState extends State<LoginInScreen> {
     print("printing the width: $width, height: $height ");
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: kAppBar,
+      // appBar: kAppBar,
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -196,166 +196,165 @@ class _LoginInScreenState extends State<LoginInScreen> {
             //      BorderRadius.only(bottomLeft: Radius.circular((200/752)*height)),
             //     ),
             //Text('Login Here', style: TextStyle(color: appThemeColor, fontSize: 50/360*width, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),),
-                const SizedBox(
-                  height: 150,
+            //     const SizedBox(
+            //       height: 150,
+            //     ),
+            Container(
+              height: 250,
+                width: double.infinity,
+                decoration:  BoxDecoration(
+                  color: kAppThemeColor,
+                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(150), bottomRight: Radius.circular(150)),
                 ),
+                child: const Center(child: Text(
+                  "Welcome to ByteBond!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.yellow,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 50,
+
+                  ), )),
+            ),
+
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                elevation: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          tileMode: TileMode.mirror,
-                          colors: [
-                            kAppThemeColor,
-                            Colors.white,
-                            kAppThemeColor,
-                          ]
-                      )
-                  ),
-                  child: Padding(
-                    padding:  EdgeInsets.all((16.0/752)*height),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 100,
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    'assets/images/animatePerson.gif'
-                                  //'assets/images/animatePerson.gif'
-                                ),
-                              ),
+              child: Padding(
+                padding:  EdgeInsets.all((16.0/752)*height),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 100,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                                'assets/images/animatePerson.gif'
+                              //'assets/images/animatePerson.gif'
                             ),
                           ),
-                          SizedBox(height: (10/752)*height),
-                          TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            validator: _validateEmail,
-                            controller: fullNameController,
-                            decoration: InputDecoration(
-                              labelText: 'Email',
-                              labelStyle: const  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                              enabledBorder: focusBorder(),
-                              focusedBorder: focusBorder(),
-                              disabledBorder: focusBorder(),
-                              focusedErrorBorder:   errorBorder(),
-                              errorBorder: errorBorder(),
-                              prefixIcon: const Icon(
-                                Icons.person,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 10/752*height),
-                          TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            validator: (value) => value!.length<6 ? "password should be more than 6 characters" : null,
-                            controller: passwordController,
-                            obscureText: !isPasswordVisibility,
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                              enabledBorder: focusBorder(),
-                              focusedBorder: focusBorder(),
-                              disabledBorder: focusBorder(),
-                              focusedErrorBorder: const  OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                                  borderSide: BorderSide(
-                                    color:Colors.red,
-                                    width: 3,
-                                  )
-                              ),
-                              errorBorder: const OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                                  borderSide: BorderSide(
-                                    color:Colors.red,
-                                    width: 3,
-                                  )
-                              ),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isPasswordVisibility = !isPasswordVisibility;
-                                  });
-                                },
-                                icon: Icon(
-                                  isPasswordVisibility ? Icons.visibility : Icons.visibility_off,
-                                ),),
-                              prefixIcon: const  Icon(
-                                Icons.password,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          // SizedBox(height: 10/752*height),
-                          TextButton(
-                              onPressed: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ForgotPasswordScreen(),
-                                  ),
-                                );
-                              },
-                              child: const  Text('forgot password?')
-                          ),
-                          // SizedBox(height: 10/752*height),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.resolveWith((states) => kAppThemeColor),
-                              ),
-                              onPressed: ()  async {
-                                if(_formKey.currentState!.validate())
-                                {
-                                  print("clicked login button");
-                                  await _postLoginDAta();
-                                  await _saveUserDataFirstTime();
-                                  await _setUserLoggedIn();
-                                  await _setJWTToken();
-                                  print("jwtToken : $JWTToken");
-                                  print("inside the userId inside the formc click block of the code: $userId");
-                                  if(userId != null) {
-                                      await _setUserLoggedIn();
-                                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const RandomCall()), (route) => false);
-                                  }
-                                }
-                              },
-                              child:  const Text('Login ',style: TextStyle(color: Colors.white,fontSize: 20),),
-                            ),
-                          ),
-                           Row(
-                             mainAxisAlignment: MainAxisAlignment.center,
-                             children: [
-                               const Text("Don't have an account? "),
-                               TextButton(
-                                 style: const ButtonStyle(
-                                   //backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.grey),
-                                 ),
-                                 onPressed: ()  async {
-                                   Navigator.push(
-                                     context,
-                                     MaterialPageRoute(
-                                       builder: (context) => SignUpScreen(),
-                                     ),
-                                   );
-                                 },
-                                 child:   Text('Signup ',style: TextStyle(color: kAppThemeColor,fontSize: 15),),
-                               ),
-                             ],
-                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      SizedBox(height: (10/752)*height),
+                      TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: _validateEmail,
+                        controller: fullNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          labelStyle: const  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                          enabledBorder: focusBorder(),
+                          focusedBorder: focusBorder(),
+                          disabledBorder: focusBorder(),
+                          focusedErrorBorder:   errorBorder(),
+                          errorBorder: errorBorder(),
+                          prefixIcon: const Icon(
+                            Icons.person,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10/752*height),
+                      TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value) => value!.length<6 ? "password should be more than 6 characters" : null,
+                        controller: passwordController,
+                        obscureText: !isPasswordVisibility,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                          enabledBorder: focusBorder(),
+                          focusedBorder: focusBorder(),
+                          disabledBorder: focusBorder(),
+                          focusedErrorBorder: const  OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              borderSide: BorderSide(
+                                color:Colors.red,
+                                width: 3,
+                              )
+                          ),
+                          errorBorder: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              borderSide: BorderSide(
+                                color:Colors.red,
+                                width: 3,
+                              )
+                          ),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isPasswordVisibility = !isPasswordVisibility;
+                              });
+                            },
+                            icon: Icon(
+                              isPasswordVisibility ? Icons.visibility : Icons.visibility_off,
+                            ),),
+                          prefixIcon: const  Icon(
+                            Icons.password,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      // SizedBox(height: 10/752*height),
+                      TextButton(
+                          onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: const  Text('forgot password?')
+                      ),
+                      // SizedBox(height: 10/752*height),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith((states) => kAppThemeColor),
+                          ),
+                          onPressed: ()  async {
+                            if(_formKey.currentState!.validate())
+                            {
+                              print("clicked login button");
+                              await _postLoginDAta();
+                              await _saveUserDataFirstTime();
+                              await _setUserLoggedIn();
+                              await _setJWTToken();
+                              print("jwtToken : $JWTToken");
+                              print("inside the userId inside the formc click block of the code: $userId");
+                              if(userId != null) {
+                                  await _setUserLoggedIn();
+                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const RandomCall()), (route) => false);
+                              }
+                            }
+                          },
+                          child:  const Text('Login ',style: TextStyle(color: Colors.white,fontSize: 20),),
+                        ),
+                      ),
+                       Row(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           const Text("Don't have an account? "),
+                           TextButton(
+                             style: const ButtonStyle(
+                               //backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.grey),
+                             ),
+                             onPressed: ()  async {
+                               Navigator.push(
+                                 context,
+                                 MaterialPageRoute(
+                                   builder: (context) => SignUpScreen(),
+                                 ),
+                               );
+                             },
+                             child:   Text('Signup ',style: TextStyle(color: kAppThemeColor,fontSize: 15),),
+                           ),
+                         ],
+                       ),
+                    ],
                   ),
                 ),
               ),
